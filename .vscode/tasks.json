@@ -7,14 +7,10 @@
             "args": [
                 "-fdiagnostics-color=always",
                 "-I${workspaceFolder}",
-                "-I${workspaceFolder}\\ddl_mb",
-                "-I${workspaceFolder}\\ddl_mb\\ddl_mb_port",
                 "-g",
-                "${workspaceFolder}\\ddl_mb\\*.c",
-                "${workspaceFolder}\\ddl_mb\\ddl_mb_port\\*.c",
                 "${workspaceFolder}\\*.c",
                 "-o",
-                "${workspaceFolder}\\app.exe"
+                "${workspaceFolder}\\queue.exe"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"

@@ -1,12 +1,14 @@
 {
     "files.associations": {
         "ddl_log.h": "c",
-        "ddl_base.h": "c"
+        "ddl_base.h": "c",
+        "compare": "c",
+        "*.tcc": "c",
+        "typeinfo": "c",
+        "ddl_queue.h": "c"
     },
     "C_Cpp.default.customConfigurationVariables": {},
     "C_Cpp.default.includePath": [
-        "${workspaceFolder}/**",
-        "${workspaceFolder}/ddl_mb/**",
-        "${workspaceFolder}/ddl_mb_port/**"
+        "${workspaceFolder}/**"
     ]
 }

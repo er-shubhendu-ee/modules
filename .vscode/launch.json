@@ -5,7 +5,7 @@
             "name": "C/C++: g++.exe build and debug app",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}\\app.exe",
+            "program": "${workspaceFolder}\\queue.exe",
             "args": [],
             "stopAtEntry": true,
             "cwd": "${workspaceFolder}",

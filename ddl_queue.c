@@ -1,6 +1,6 @@
 /**
  * @file      ddl_utils.c
- * @author:   Shubhinu B B
+ * @author:   Shubhfrontu B B
  * @date:     02/02/2023
  * @brief
  * @details
@@ -8,13 +8,19 @@
  * @copyright
  *
  **/
+#define PROJ_VER "0.0.1"
 
-#include "ddl_utils.h"
+#include "ddl_queue.h"
 
 #include "ddl_log.h"
 
+// #ifndef LOG_LEVEL_VERBOSE
+// #define LOG_LEVEL_VERBOSE
+// #endif
+
 ddl_utils_queueHandle_t ddl_utils_queue_create(uint32_t elementCount, uint32_t elementSizeBytes) {
     DDL_LOG("entry");
+    printf("using queue version: %s", PROJ_VER);
     ddl_utils_queueHandle_t newQueue = NULL;
     if (elementCount && elementSizeBytes) {
         newQueue = malloc(sizeof(ddl_utils_queueStruct_t));
@@ -25,6 +31,7 @@ ddl_utils_queueHandle_t ddl_utils_queue_create(uint32_t elementCount, uint32_t e
                 memset(newQueue->pElementBuffer, 0, (elementSizeBytes * elementCount));
                 newQueue->elemSpace = elementCount;
                 newQueue->elemSizeBytes = elementSizeBytes;
+                newQueue->front = newQueue->rear = -1;
             } else {
                 DDL_LOG("error");
             }
@@ -42,24 +49,56 @@ ddl_base_status_t ddl_queue_put(ddl_utils_queueHandle_t queueHandle, void* pElem
     DDL_LOG("entry");
     ddl_base_status_t processStatus = DDL_BASE_STATUS_OK;
     bool isOkToPut = false;
+
+#if defined(LOG_LEVEL_VERBOSE)
+    printf("%s on entry front: %d\n", __func__, queueHandle->front);
+    printf("%s on entry rear: %d\n", __func__, queueHandle->rear);
+#endif
+
     if (queueHandle && pElement) {
         if (!queueHandle->isLocked) {
             queueHandle->isLocked = true;
-            if (queueHandle->in < queueHandle->elemSpace - 1) {
-                if (queueHandle->in < queueHandle->out - 2) {
-                    queueHandle->in++;
-                    isOkToPut = true;
-                } else if (queueHandle->in > queueHandle->out) {
-                    queueHandle->in++;
-                    isOkToPut = true;
+            if (queueHandle->rear >= queueHandle->front) {
+                if (queueHandle->rear == queueHandle->elemSpace - 1) {
+                    if (queueHandle->front > 0) {
+                        queueHandle->rear = 0;
+                        isOkToPut = true;
+                    } else {
+                        processStatus = DDL_BASE_STATUS_ERROR;
+                        goto label_exitPoint;
+                    }
                 } else {
-                    processStatus = DDL_BASE_STATUS_ERROR;
+                    queueHandle->rear++;
+                    isOkToPut = true;
                 }
-            } else if (queueHandle->out > 0) {
-                queueHandle->in = 0;
+            } else if (queueHandle->rear + 1 < queueHandle->front) {
+                queueHandle->rear++;
                 isOkToPut = true;
             } else {
                 processStatus = DDL_BASE_STATUS_ERROR;
+                goto label_exitPoint;
+            }
+
+            if (isOkToPut) {
+#if defined(LOG_LEVEL_VERBOSE)
+                printf("copy to %lu from %lu, %d bytes\n",
+                       (uint8_t*)(queueHandle->pElementBuffer + queueHandle->rear * queueHandle->elemSizeBytes),
+                       (uint8_t*)pElement, queueHandle->elemSizeBytes);
+#endif
+
+                memcpy((uint8_t*)(queueHandle->pElementBuffer + queueHandle->rear * queueHandle->elemSizeBytes),
+                       (uint8_t*)pElement, queueHandle->elemSizeBytes);
+                if (queueHandle->front == -1) {
+                    queueHandle->front = 0;
+                } else {
+                    /* code */
+                }
+            } else {
+                /* code */
+            }
+
+            if (queueHandle->front == -1) {
+                queueHandle->front = 0;
             }
         } else {
             processStatus = DDL_BASE_STATUS_BUSY;
@@ -67,13 +106,13 @@ ddl_base_status_t ddl_queue_put(ddl_utils_queueHandle_t queueHandle, void* pElem
     } else {
         processStatus = DDL_BASE_STATUS_ERROR;
     }
-    if (isOkToPut) {
-        memset(queueHandle->pElementBuffer + queueHandle->in, 0, queueHandle->elemSizeBytes);
-        memcpy(queueHandle->pElementBuffer + queueHandle->in, pElement, queueHandle->elemSizeBytes);
-        queueHandle->elemInQueue++;
-    }
-
+label_exitPoint:
     queueHandle->isLocked = false;
+
+#if defined(LOG_LEVEL_VERBOSE)
+    printf("%s on exit front: %d\n", __func__, queueHandle->front);
+    printf("%s on exit rear: %d\n", __func__, queueHandle->rear);
+#endif
 
     DDL_LOG("exit");
     return processStatus;
@@ -83,21 +122,41 @@ ddl_base_status_t ddl_queue_get(ddl_utils_queueHandle_t queueHandle, void* pBuff
     DDL_LOG("entry");
     ddl_base_status_t processStatus = DDL_BASE_STATUS_OK;
 
+#if defined(LOG_LEVEL_VERBOSE)
+    printf("%s on entry front: %d\n", __func__, queueHandle->front);
+    printf("%s on entry rear: %d\n", __func__, queueHandle->rear);
+#endif
+
     if (queueHandle && pBuffer) {
         if (!queueHandle->isLocked) {
             queueHandle->isLocked = true;
 
-            if (queueHandle->elemInQueue) {
-                memcpy(pBuffer, queueHandle->pElementBuffer + queueHandle->out, queueHandle->elemSizeBytes);
-                queueHandle->elemInQueue--;
-
-                if (queueHandle->out < queueHandle->elemSpace - 1) {
-                    queueHandle->out++;
-                } else {
-                    queueHandle->out = 0;
-                }
-            } else {
+            if (queueHandle->front == -1) {
+                printf("queue empty");
                 processStatus = DDL_BASE_STATUS_ERROR;
+                goto label_exitPoint;
+            }
+
+#if defined(LOG_LEVEL_VERBOSE)
+            printf("copy to %lu from %lu, %d bytes\n", (uint8_t*)pBuffer,
+                   (uint8_t*)(queueHandle->pElementBuffer + queueHandle->rear * queueHandle->elemSizeBytes),
+                   queueHandle->elemSizeBytes);
+#endif
+
+            memcpy((uint8_t*)pBuffer,
+                   (uint8_t*)(queueHandle->pElementBuffer + queueHandle->front * queueHandle->elemSizeBytes),
+                   queueHandle->elemSizeBytes);
+            memset((uint8_t*)(queueHandle->pElementBuffer + queueHandle->front * queueHandle->elemSizeBytes), 0,
+                   queueHandle->elemSizeBytes);
+
+            if (queueHandle->front == queueHandle->rear) {
+                queueHandle->front = queueHandle->rear = -1;
+            } else {
+                if (queueHandle->front == queueHandle->elemSpace - 1) {
+                    queueHandle->front = 0;
+                } else {
+                    (queueHandle->front)++;
+                }
             }
 
         } else {
@@ -107,10 +166,25 @@ ddl_base_status_t ddl_queue_get(ddl_utils_queueHandle_t queueHandle, void* pBuff
         processStatus = DDL_BASE_STATUS_ERROR;
     }
 
+label_exitPoint:
     queueHandle->isLocked = false;
+
+#if defined(LOG_LEVEL_VERBOSE)
+    printf("%s on exit front: %d\n", __func__, queueHandle->front);
+    printf("%s on exit rear: %d\n", __func__, queueHandle->rear);
+#endif
 
     DDL_LOG("exit");
     return processStatus;
+}
+
+void ddl_queue_print(ddl_utils_queueHandle_t queue) {
+    for (size_t i = 0; i < queue->elemSpace; i++) {
+        uint32_t* pValue = 0;
+        pValue = (uint8_t*)(queue->pElementBuffer + i * queue->elemSizeBytes);
+        printf("%d, ", *pValue);
+    }
+    printf("\n");
 }
 
 WORD CRC16(const BYTE* nData, WORD wLength) {
