@@ -145,6 +145,7 @@ int app_helper_QueueGet(logStorageStruct_t *pLogStorageStructBuff, int logCount)
 #if defined(LOG_LEVEL_VERBOSE)
     DDL_LOG("%s : %d : entry");
 #endif
+    int elementCopiedCount = 0;
     int processStatus = 0;
 
 #if defined(LOG_LEVEL_VERBOSE)
@@ -173,17 +174,20 @@ int app_helper_QueueGet(logStorageStruct_t *pLogStorageStructBuff, int logCount)
            gStorageQueueHandle->elemSizeBytes);
 #endif
 
-    memcpy((uint8_t *)pLogStorageStructBuff, (uint8_t *)&gStorageQueueHandle->storage[gStorageQueueHandle->front],
-           gStorageQueueHandle->elemSizeBytes);
-    gStorageQueueHandle->elemInQueue--;
-
-    if (gStorageQueueHandle->front == gStorageQueueHandle->rear) {
-        gStorageQueueHandle->front = gStorageQueueHandle->rear = -1;
-    } else {
-        if (gStorageQueueHandle->front == gStorageQueueHandle->elemSpace - 1) {
-            gStorageQueueHandle->front = 0;
+    while ((logCount > elementCopiedCount) && (0 < gStorageQueueHandle->elemInQueue)) {
+        memcpy((uint8_t *)pLogStorageStructBuff + (sizeof(logStorageStruct_t) * elementCopiedCount),
+               (uint8_t *)&gStorageQueueHandle->storage[gStorageQueueHandle->front],
+               gStorageQueueHandle->elemSizeBytes);
+        gStorageQueueHandle->elemInQueue--;
+        elementCopiedCount++;
+        if (gStorageQueueHandle->front == gStorageQueueHandle->rear) {
+            gStorageQueueHandle->front = gStorageQueueHandle->rear = -1;
         } else {
-            (gStorageQueueHandle->front)++;
+            if (gStorageQueueHandle->front == gStorageQueueHandle->elemSpace - 1) {
+                gStorageQueueHandle->front = 0;
+            } else {
+                (gStorageQueueHandle->front)++;
+            }
         }
     }
 
