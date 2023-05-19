@@ -28,6 +28,7 @@ int main(void) {
     app_helper_QueuePut(3, 10, 3);
     app_helper_QueuePut(4, 10, 4);
     app_helper_QueuePut(5, 10, 5);
+    app_helper_QueuePut(6, 5, 6);
 
     app_helper_QueueGet(logStorageStructArrayTemp, 1);
 

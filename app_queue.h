@@ -72,24 +72,6 @@ int app_helper_QueueGet(logStorageStruct_t *pLogStorageStructBuff, int logCount)
 /**
  * @brief
  *
- * @return int [out]    0 = not full
- *                      1 = full
- *                     -1 = error accessing the queue
- */
-int app_helper_IsStorageQueueFull(void);
-
-/**
- * @brief
- *
- * @return int [out]    0 = not empty
- *                      1 = empty
- *                     -1 = error accessing the queue
- */
-int app_helper_IsStorageQueueEmpty(void);
-
-/**
- * @brief
- *
  * @return int [out]    >= 0 :: number of elements successfully printed
  *                      -1   :: error accessing the queue
  */
