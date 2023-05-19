@@ -1,14 +1,7 @@
 {
     "files.associations": {
-        "ddl_log.h": "c",
-        "ddl_base.h": "c",
-        "compare": "c",
-        "*.tcc": "c",
-        "typeinfo": "c",
-        "ddl_queue.h": "c"
-    },
-    "C_Cpp.default.customConfigurationVariables": {},
-    "C_Cpp.default.includePath": [
-        "${workspaceFolder}/**"
-    ]
+        "*.py": "python",
+        "compare": "cpp",
+        "app_queue.h": "c"
+    }
 }
