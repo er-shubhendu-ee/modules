@@ -1,105 +1,63 @@
 /**
  * @file      main.c
  * @author:   Shubhendu B B
- * @date:     04/02/2023
+ * @date:     18/05/2023
  * @brief
  * @details
  *
  * @copyright
  *
  **/
-#include <stddef.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
 
-#include "ddl_queue.h"
-
-ddl_utils_queueHandle_t queue;
+#include "app_queue.h"
 
 int main(void) {
-    uint32_t value = 0;
-    queue = ddl_utils_queue_create(5, sizeof(uint32_t));
+    printf("%s : %d : started!\r\n", __func__, __LINE__);
 
-    value = 0;
-    ddl_queue_put(queue, &value);
-    ddl_queue_print(queue);
+    logStorageStruct_t logStorageStructArrayTemp[LOG_STORAGE_COUNT_MAX] = {0};
+    storageQueueHandle_t logStorageQueueHandle = NULL;
+    logStorageQueueHandle = app_helper_StorageQueueInit();
 
-    value = 1;
-    ddl_queue_put(queue, &value);
-    ddl_queue_print(queue);
+    if (logStorageQueueHandle == NULL) {
+        printf("%s : %d : Error creating queue.\r\n", __func__, __LINE__);
+        return -1;
+    }
 
-    ddl_queue_get(queue, &value);
-    printf("%d\n", value);
-    ddl_queue_print(queue);
+    app_helper_QueuePut(1, 10, 1);
+    app_helper_QueuePut(2, 10, 2);
+    app_helper_QueuePut(3, 10, 3);
+    app_helper_QueuePut(4, 10, 4);
+    app_helper_QueuePut(5, 10, 5);
+    app_helper_QueuePut(6, 5, 6);
 
-    value = 2;
-    ddl_queue_put(queue, &value);
-    ddl_queue_print(queue);
+    app_helper_QueueGet(logStorageStructArrayTemp, 1);
 
-    value = 3;
-    ddl_queue_put(queue, &value);
-    ddl_queue_print(queue);
+    app_helper_QueuePut(6, 10, 6);
 
-    value = 4;
-    ddl_queue_put(queue, &value);
-    ddl_queue_print(queue);
+    app_helper_QueueGet(logStorageStructArrayTemp, 1);
 
-    ddl_queue_get(queue, &value);
-    printf("%d\n", value);
-    ddl_queue_print(queue);
+    app_helper_QueuePut(7, 10, 7);
 
-    ddl_queue_get(queue, &value);
-    printf("%d\n", value);
-    ddl_queue_print(queue);
+    app_helper_QueueGet(logStorageStructArrayTemp, 1);
 
-    ddl_queue_get(queue, &value);
-    printf("%d\n", value);
-    ddl_queue_print(queue);
+    app_helper_QueuePut(8, 10, 8);
 
-    value = 5;
-    ddl_queue_put(queue, &value);
-    ddl_queue_print(queue);
+    app_helper_QueueGet(logStorageStructArrayTemp, 1);
 
-    value = 6;
-    ddl_queue_put(queue, &value);
-    ddl_queue_print(queue);
+    app_helper_QueuePut(9, 10, 9);
+    app_helper_QueuePut(10, 10, 10);
 
-    value = 7;
-    ddl_queue_put(queue, &value);
-    ddl_queue_print(queue);
+    app_helper_PrintStorageQueue();
 
-    value = 8;
-    ddl_queue_put(queue, &value);
-    ddl_queue_print(queue);
+    printf("%s : %d : %d logs read success.\r\n", __func__, __LINE__,
+           app_helper_QueueGet(logStorageStructArrayTemp, 1));
 
-    value = 9;
-    ddl_queue_put(queue, &value);
-    ddl_queue_print(queue);
+    app_helper_PrintStorageQueue();
 
-    ddl_queue_get(queue, &value);
-    printf("%d\n", value);
-    ddl_queue_print(queue);
+    printf("%s : %d : %d logs read success.\r\n", __func__, __LINE__,
+           app_helper_QueueGet(logStorageStructArrayTemp, 3));
 
-    value = 0;
-    ddl_queue_put(queue, &value);
-    ddl_queue_print(queue);
-
-    ddl_queue_get(queue, &value);
-    printf("%d\n", value);
-    ddl_queue_print(queue);
-
-    ddl_queue_get(queue, &value);
-    printf("%d\n", value);
-    ddl_queue_print(queue);
-
-    ddl_queue_get(queue, &value);
-    printf("%d\n", value);
-    ddl_queue_print(queue);
-
-    ddl_queue_get(queue, &value);
-    printf("%d\n", value);
-    ddl_queue_print(queue);
+    app_helper_PrintStorageQueue();
 
     return 0;
 }
