@@ -37,6 +37,7 @@ ddl_queue_handle_t ddl_queue_queue_create(uint32_t elementCount,
 ddl_base_status_t ddl_queue_put(ddl_queue_handle_t queueHandle, void* pElement);
 ddl_base_status_t ddl_queue_get(ddl_queue_handle_t queueHandle, void* pBuffer);
 void ddl_queue_print(ddl_queue_handle_t queue);
+ddl_base_status_t ddl_queue_delete(ddl_queue_handle_t queue);
 
 #ifdef __cplusplus
 }

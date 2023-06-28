@@ -110,5 +110,7 @@ int main(void) {
          value);
   ddl_queue_print(queue);
 
+  ddl_queue_delete(queue);
+
   return 0;
 }

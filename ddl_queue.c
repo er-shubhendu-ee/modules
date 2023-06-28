@@ -189,11 +189,22 @@ label_exitPoint:
   return processStatus;
 }
 
+ddl_base_status_t ddl_queue_delete(ddl_queue_handle_t queue) {
+  ddl_base_status_t processStatus = DDL_BASE_STATUS_OK;
+  if (queue) {
+    free(queue);
+  } else {
+    processStatus = DDL_BASE_STATUS_ERROR;
+  }
+
+  return processStatus;
+}
+
 void ddl_queue_print(ddl_queue_handle_t queue) {
   for (size_t i = 0; i < queue->elemSpace; i++) {
     uint32_t* pValue = 0;
     pValue = (uint32_t*)((uint8_t*)queue->pElementBuffer +
                          (i * queue->elemSizeBytes));
-    printf("%s : %d : [%d]= %d, \r\n", __func__, __LINE__, i, *pValue);
+    printf("%s : %d : queue[%d]= %d, \r\n", __func__, __LINE__, i, *pValue);
   }
 }
