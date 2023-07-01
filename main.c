@@ -28,12 +28,10 @@ ddl_queue_handle_t queue, queue_2;
 
 int main(void) {
   QueueElement_t queueElement = {0};
-  queue =
-      ddl_queue_queue_create_static(sizeof(QueueElement_t), QUEUE_ELEMENT_COUNT,
-                                    (uint8_t *)&queueElementArray[0]);
+  queue = ddl_queue_create_static(sizeof(QueueElement_t), QUEUE_ELEMENT_COUNT,
+                                  (uint8_t *)&queueElementArray[0]);
 
-  queue_2 =
-      ddl_queue_queue_create_static(sizeof(QueueElement_t), QUEUE_ELEMENT_COUNT,
+  queue_2 = ddl_queue_create_static(sizeof(QueueElement_t), QUEUE_ELEMENT_COUNT,
                                     (uint8_t *)&queueElementArray[0]);
   queueElement.byte_1 = 1;
   queueElement.word_1 = 11;

@@ -12,8 +12,6 @@
 
 #include "ddl_queue.h"
 
-#include "ddl_log.h"
-
 // #ifndef LOG_LEVEL_VERBOSE
 // #define LOG_LEVEL_VERBOSE
 // #endif
@@ -34,8 +32,8 @@ int nextAvailableSlotInPool = 0;
 #endif
 
 #if !defined(DDL_QUEUE_USE_STATIC)
-ddl_queue_handle_t ddl_queue_queue_create(uint32_t elementCount,
-                                          uint32_t elementSizeBytes) {
+ddl_queue_handle_t ddl_queue_create(uint32_t elementCount,
+                                    uint32_t elementSizeBytes) {
   printf("%s : %d : using queue version: %s\n", __func__, __LINE__, PROJ_VER);
   ddl_queue_handle_t newQueue = NULL;
   if (elementCount && elementSizeBytes) {
@@ -63,9 +61,9 @@ ddl_queue_handle_t ddl_queue_queue_create(uint32_t elementCount,
 #endif
 
 #if defined(DDL_QUEUE_USE_STATIC)
-ddl_queue_handle_t ddl_queue_queue_create_static(uint32_t elementSizeInBytes,
-                                                 uint32_t elementCount,
-                                                 uint8_t* pElementArray) {
+ddl_queue_handle_t ddl_queue_create_static(uint32_t elementSizeInBytes,
+                                           uint32_t elementCount,
+                                           uint8_t* pElementArray) {
   printf("%s : %d : using queue version: %s\n", __func__, __LINE__, PROJ_VER);
   ddl_queue_handle_t newQueue = NULL;
   if (elementSizeInBytes && elementCount && pElementArray &&
