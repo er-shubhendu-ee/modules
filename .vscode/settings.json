@@ -5,7 +5,9 @@
         "compare": "c",
         "*.tcc": "c",
         "typeinfo": "c",
-        "ddl_queue.h": "c"
+        "ddl_queue.h": "c",
+        "string.h": "c",
+        "type_traits": "c"
     },
     "C_Cpp.default.customConfigurationVariables": {},
     "C_Cpp.default.includePath": [

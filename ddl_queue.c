@@ -18,6 +18,22 @@
 #define LOG_LEVEL_VERBOSE
 #endif
 
+#define DDL_QUEUE_USE_STATIC 1
+
+#if defined(DDL_QUEUE_USE_STATIC)
+#define DDL_QUEUE_POOL_SIZE 5
+#endif
+
+#if defined(DDL_QUEUE_USE_STATIC)
+#if defined(DDL_QUEUE_POOL_SIZE)
+ddl_queue_struct_t ddl_queue_pool[DDL_QUEUE_POOL_SIZE];
+#else
+#error "DDL_QUEUE_POOL_SIZE not defined"
+#endif
+int nextAvailableSlotInPool = 0;
+#endif
+
+#if !defined(DDL_QUEUE_USE_STATIC)
 ddl_queue_handle_t ddl_queue_queue_create(uint32_t elementCount,
                                           uint32_t elementSizeBytes) {
   printf("%s : %d : using queue version: %s\n", __func__, __LINE__, PROJ_VER);
@@ -44,6 +60,38 @@ ddl_queue_handle_t ddl_queue_queue_create(uint32_t elementCount,
 
   return newQueue;
 }
+#endif
+
+#if defined(DDL_QUEUE_USE_STATIC)
+ddl_queue_handle_t ddl_queue_queue_create_static(uint32_t elementSizeInBytes,
+                                                 uint32_t elementCount,
+                                                 uint8_t* pElementArray) {
+  printf("%s : %d : using queue version: %s\n", __func__, __LINE__, PROJ_VER);
+  ddl_queue_handle_t newQueue = NULL;
+  if (elementSizeInBytes && elementCount && pElementArray &&
+      (DDL_QUEUE_POOL_SIZE > (nextAvailableSlotInPool + 1))) {
+    newQueue = &ddl_queue_pool[nextAvailableSlotInPool];
+    if (newQueue) {
+      nextAvailableSlotInPool++;
+
+      memset(newQueue, 0, sizeof(ddl_queue_struct_t));
+      newQueue->pElementBuffer = pElementArray;
+
+      memset(pElementArray, 0, (elementSizeInBytes * elementCount));
+      newQueue->elemSpace = elementCount;
+      newQueue->elemSizeBytes = elementSizeInBytes;
+      newQueue->front = newQueue->rear = -1;
+
+    } else {
+      printf("%s : %d : error", __func__, __LINE__);
+    }
+  } else {
+    printf("%s : %d : error", __func__, __LINE__);
+  }
+
+  return newQueue;
+}
+#endif
 
 ddl_base_status_t ddl_queue_put(ddl_queue_handle_t queueHandle,
                                 void* pElement) {
@@ -191,12 +239,30 @@ label_exitPoint:
 
 ddl_base_status_t ddl_queue_delete(ddl_queue_handle_t queue) {
   ddl_base_status_t processStatus = DDL_BASE_STATUS_OK;
+
   if (queue) {
+#if !defined(DDL_QUEUE_USE_STATIC)
     free(queue);
+#else
+    if ((&ddl_queue_pool[0] > queue) ||
+        (&ddl_queue_pool[DDL_QUEUE_POOL_SIZE - 1] < queue)) {
+      processStatus = DDL_BASE_STATUS_ERROR;
+      goto label_exitPoint;
+    }
+
+    int i = 0;
+    while ((size_t)((ddl_queue_struct_t*)ddl_queue_pool + i) != (size_t)queue) {
+      i++;
+    }
+
+    memset((uint8_t*)&ddl_queue_pool[i], 0, sizeof(ddl_queue_struct_t));
+
+#endif
   } else {
     processStatus = DDL_BASE_STATUS_ERROR;
   }
 
+label_exitPoint:
   return processStatus;
 }
 

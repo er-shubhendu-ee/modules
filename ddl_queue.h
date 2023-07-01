@@ -34,6 +34,11 @@ extern "C" {
 
 ddl_queue_handle_t ddl_queue_queue_create(uint32_t elementCount,
                                           uint32_t elementSizeBytes);
+
+ddl_queue_handle_t ddl_queue_queue_create_static(uint32_t elementSize,
+                                                 uint32_t elementCount,
+                                                 uint8_t* pElementArray);
+
 ddl_base_status_t ddl_queue_put(ddl_queue_handle_t queueHandle, void* pElement);
 ddl_base_status_t ddl_queue_get(ddl_queue_handle_t queueHandle, void* pBuffer);
 void ddl_queue_print(ddl_queue_handle_t queue);
