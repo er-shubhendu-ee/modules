@@ -38,15 +38,22 @@ int main(void) {
   queueElement.byte_1 = 1;
   queueElement.word_1 = 11;
   queueElement.dword_1 = 123456789;
-  ddl_queue_put(queue, &queueElement);
+  if (ddl_queue_send(queue, &queueElement)) {
+    printf("%s : %d : Error: Failed to send to queue.\r\n", __func__, __LINE__);
+  }
 
   queueElement.byte_1 = 2;
   queueElement.word_1 = 22;
   queueElement.dword_1 = 123456789;
-  ddl_queue_put(queue, &queueElement);
+  if (ddl_queue_send(queue, &queueElement)) {
+    printf("%s : %d : Error: Failed to send to queue.\r\n", __func__, __LINE__);
+  }
 
   memset(&queueElement, 0, sizeof(queueElement));
-  ddl_queue_get(queue, &queueElement);
+  if (ddl_queue_recv(queue, &queueElement)) {
+    printf("%s : %d : : Error: Failed to receive from queue.", __func__,
+           __LINE__);
+  }
   printf(
       "%s : %d : received value queueElement.byte_1: %d, queueElement.word_1: "
       "%d "
@@ -57,20 +64,29 @@ int main(void) {
   queueElement.byte_1 = 3;
   queueElement.word_1 = 33;
   queueElement.dword_1 = 123456789;
-  ddl_queue_put(queue, &queueElement);
+  if (ddl_queue_send(queue, &queueElement)) {
+    printf("%s : %d : Error: Failed to send to queue.\r\n", __func__, __LINE__);
+  }
 
   queueElement.byte_1 = 4;
   queueElement.word_1 = 44;
   queueElement.dword_1 = 123456789;
-  ddl_queue_put(queue, &queueElement);
+  if (ddl_queue_send(queue, &queueElement)) {
+    printf("%s : %d : Error: Failed to send to queue.\r\n", __func__, __LINE__);
+  }
 
   queueElement.byte_1 = 5;
   queueElement.word_1 = 55;
   queueElement.dword_1 = 123456789;
-  ddl_queue_put(queue, &queueElement);
+  if (ddl_queue_send(queue, &queueElement)) {
+    printf("%s : %d : Error: Failed to send to queue.\r\n", __func__, __LINE__);
+  }
 
   memset(&queueElement, 0, sizeof(queueElement));
-  ddl_queue_get(queue, &queueElement);
+  if (ddl_queue_recv(queue, &queueElement)) {
+    printf("%s : %d : : Error: Failed to receive from queue.", __func__,
+           __LINE__);
+  }
   printf(
       "%s : %d : received value queueElement.byte_1: %d, queueElement.word_1: "
       "%d "
@@ -79,7 +95,10 @@ int main(void) {
       queueElement.dword_1);
 
   memset(&queueElement, 0, sizeof(queueElement));
-  ddl_queue_get(queue, &queueElement);
+  if (ddl_queue_recv(queue, &queueElement)) {
+    printf("%s : %d : : Error: Failed to receive from queue.", __func__,
+           __LINE__);
+  }
   printf(
       "%s : %d : received value queueElement.byte_1: %d, queueElement.word_1: "
       "%d "
@@ -88,7 +107,10 @@ int main(void) {
       queueElement.dword_1);
 
   memset(&queueElement, 0, sizeof(queueElement));
-  ddl_queue_get(queue, &queueElement);
+  if (ddl_queue_recv(queue, &queueElement)) {
+    printf("%s : %d : : Error: Failed to receive from queue.", __func__,
+           __LINE__);
+  }
   printf(
       "%s : %d : received value queueElement.byte_1: %d, queueElement.word_1: "
       "%d "
@@ -99,30 +121,43 @@ int main(void) {
   queueElement.byte_1 = 6;
   queueElement.word_1 = 66;
   queueElement.dword_1 = 123456789;
-  ddl_queue_put(queue, &queueElement);
+  if (ddl_queue_send(queue, &queueElement)) {
+    printf("%s : %d : Error: Failed to send to queue.\r\n", __func__, __LINE__);
+  }
 
   queueElement.byte_1 = 7;
   queueElement.word_1 = 77;
   queueElement.dword_1 = 123456789;
-  ddl_queue_put(queue, &queueElement);
+  if (ddl_queue_send(queue, &queueElement)) {
+    printf("%s : %d : Error: Failed to send to queue.\r\n", __func__, __LINE__);
+  }
 
   queueElement.byte_1 = 8;
   queueElement.word_1 = 88;
   queueElement.dword_1 = 123456789;
-  ddl_queue_put(queue, &queueElement);
+  if (ddl_queue_send(queue, &queueElement)) {
+    printf("%s : %d : Error: Failed to send to queue.\r\n", __func__, __LINE__);
+  }
 
   queueElement.byte_1 = 9;
   queueElement.word_1 = 99;
   queueElement.dword_1 = 123456789;
-  ddl_queue_put(queue, &queueElement);
+  if (ddl_queue_send(queue, &queueElement)) {
+    printf("%s : %d : Error: Failed to send to queue.\r\n", __func__, __LINE__);
+  }
 
   queueElement.byte_1 = 10;
   queueElement.word_1 = 1010;
   queueElement.dword_1 = 123456789;
-  ddl_queue_put(queue, &queueElement);
+  if (ddl_queue_send(queue, &queueElement)) {
+    printf("%s : %d : Error: Failed to send to queue.\r\n", __func__, __LINE__);
+  }
 
   memset(&queueElement, 0, sizeof(queueElement));
-  ddl_queue_get(queue, &queueElement);
+  if (ddl_queue_recv(queue, &queueElement)) {
+    printf("%s : %d : : Error: Failed to receive from queue.", __func__,
+           __LINE__);
+  }
   printf(
       "%s : %d : received value queueElement.byte_1: %d, queueElement.word_1: "
       "%d "
@@ -133,10 +168,15 @@ int main(void) {
   queueElement.byte_1 = 11;
   queueElement.word_1 = 1111;
   queueElement.dword_1 = 123456789;
-  ddl_queue_put(queue, &queueElement);
+  if (ddl_queue_send(queue, &queueElement)) {
+    printf("%s : %d : Error: Failed to send to queue.\r\n", __func__, __LINE__);
+  }
 
   memset(&queueElement, 0, sizeof(queueElement));
-  ddl_queue_get(queue, &queueElement);
+  if (ddl_queue_recv(queue, &queueElement)) {
+    printf("%s : %d : : Error: Failed to receive from queue.", __func__,
+           __LINE__);
+  }
   printf(
       "%s : %d : received value queueElement.byte_1: %d, queueElement.word_1: "
       "%d "
@@ -145,7 +185,10 @@ int main(void) {
       queueElement.dword_1);
 
   memset(&queueElement, 0, sizeof(queueElement));
-  ddl_queue_get(queue, &queueElement);
+  if (ddl_queue_recv(queue, &queueElement)) {
+    printf("%s : %d : : Error: Failed to receive from queue.", __func__,
+           __LINE__);
+  }
   printf(
       "%s : %d : received value queueElement.byte_1: %d, queueElement.word_1: "
       "%d "
@@ -154,7 +197,10 @@ int main(void) {
       queueElement.dword_1);
 
   memset(&queueElement, 0, sizeof(queueElement));
-  ddl_queue_get(queue, &queueElement);
+  if (ddl_queue_recv(queue, &queueElement)) {
+    printf("%s : %d : : Error: Failed to receive from queue.", __func__,
+           __LINE__);
+  }
   printf(
       "%s : %d : received value queueElement.byte_1: %d, queueElement.word_1: "
       "%d "
@@ -163,7 +209,10 @@ int main(void) {
       queueElement.dword_1);
 
   memset(&queueElement, 0, sizeof(queueElement));
-  ddl_queue_get(queue, &queueElement);
+  if (ddl_queue_recv(queue, &queueElement)) {
+    printf("%s : %d : : Error: Failed to receive from queue.", __func__,
+           __LINE__);
+  }
   printf(
       "%s : %d : received value queueElement.byte_1: %d, queueElement.word_1: "
       "%d "
@@ -172,7 +221,11 @@ int main(void) {
       queueElement.dword_1);
 
   memset(&queueElement, 0, sizeof(queueElement));
-  ddl_queue_get(queue, &queueElement);
+  if (ddl_queue_recv(queue, &queueElement)) {
+    printf("%s : %d : : Error: Failed to receive from queue.", __func__,
+           __LINE__);
+  }
+
   printf(
       "%s : %d : received value queueElement.byte_1: %d, queueElement.word_1: "
       "%d "

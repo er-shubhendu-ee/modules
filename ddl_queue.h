@@ -13,9 +13,8 @@
 #define __DDL_QUEUE_H__
 
 #include "ddl_base.h"
-#include "ddl_commons.h"
 
-typedef struct ddl_queue_tagStruct {
+typedef struct {
   int32_t elemSpace;
   int32_t elemSizeBytes;
   int32_t elemInQueue;
@@ -39,8 +38,9 @@ ddl_queue_handle_t ddl_queue_queue_create_static(uint32_t elementSize,
                                                  uint32_t elementCount,
                                                  uint8_t* pElementArray);
 
-ddl_base_status_t ddl_queue_put(ddl_queue_handle_t queueHandle, void* pElement);
-ddl_base_status_t ddl_queue_get(ddl_queue_handle_t queueHandle, void* pBuffer);
+ddl_base_status_t ddl_queue_send(ddl_queue_handle_t queueHandle,
+                                 void* pElement);
+ddl_base_status_t ddl_queue_recv(ddl_queue_handle_t queueHandle, void* pBuffer);
 void ddl_queue_print(ddl_queue_handle_t queue);
 ddl_base_status_t ddl_queue_delete(ddl_queue_handle_t queue);
 

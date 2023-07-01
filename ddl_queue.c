@@ -8,15 +8,15 @@
  * @copyright
  *
  **/
-#define PROJ_VER "0.0.3"
+#define PROJ_VER "0.0.4"
 
 #include "ddl_queue.h"
 
 #include "ddl_log.h"
 
-#ifndef LOG_LEVEL_VERBOSE
-#define LOG_LEVEL_VERBOSE
-#endif
+// #ifndef LOG_LEVEL_VERBOSE
+// #define LOG_LEVEL_VERBOSE
+// #endif
 
 #define DDL_QUEUE_USE_STATIC 1
 
@@ -93,8 +93,8 @@ ddl_queue_handle_t ddl_queue_queue_create_static(uint32_t elementSizeInBytes,
 }
 #endif
 
-ddl_base_status_t ddl_queue_put(ddl_queue_handle_t queueHandle,
-                                void* pElement) {
+ddl_base_status_t ddl_queue_send(ddl_queue_handle_t queueHandle,
+                                 void* pElement) {
   ddl_base_status_t processStatus = DDL_BASE_STATUS_OK;
   bool isOkToPut = false;
 
@@ -112,6 +112,7 @@ ddl_base_status_t ddl_queue_put(ddl_queue_handle_t queueHandle,
         if (queueHandle->rear == queueHandle->elemSpace - 1) {
           if (queueHandle->front > 0) {
             queueHandle->rear = 0;
+            processStatus = DDL_BASE_STATUS_OK;
             isOkToPut = true;
           } else {
             processStatus = DDL_BASE_STATUS_ERROR;
@@ -119,10 +120,12 @@ ddl_base_status_t ddl_queue_put(ddl_queue_handle_t queueHandle,
           }
         } else {
           queueHandle->rear++;
+          processStatus = DDL_BASE_STATUS_OK;
           isOkToPut = true;
         }
       } else if (queueHandle->rear + 1 < queueHandle->front) {
         queueHandle->rear++;
+        processStatus = DDL_BASE_STATUS_OK;
         isOkToPut = true;
       } else {
         processStatus = DDL_BASE_STATUS_ERROR;
@@ -146,18 +149,17 @@ ddl_base_status_t ddl_queue_put(ddl_queue_handle_t queueHandle,
           /* code */
         }
       } else {
-        /* code */
+        processStatus = DDL_BASE_STATUS_ERROR;
+        goto label_exitPoint;
       }
 
-      if (queueHandle->front == -1) {
-        queueHandle->front = 0;
-      }
     } else {
       processStatus = DDL_BASE_STATUS_BUSY;
     }
   } else {
     processStatus = DDL_BASE_STATUS_ERROR;
   }
+
 label_exitPoint:
   queueHandle->isLocked = false;
 
@@ -170,7 +172,8 @@ label_exitPoint:
   return processStatus;
 }
 
-ddl_base_status_t ddl_queue_get(ddl_queue_handle_t queueHandle, void* pBuffer) {
+ddl_base_status_t ddl_queue_recv(ddl_queue_handle_t queueHandle,
+                                 void* pBuffer) {
   ddl_base_status_t processStatus = DDL_BASE_STATUS_OK;
 
 #if defined(LOG_LEVEL_VERBOSE)
@@ -217,6 +220,7 @@ ddl_base_status_t ddl_queue_get(ddl_queue_handle_t queueHandle, void* pBuffer) {
           (queueHandle->front)++;
         }
       }
+      processStatus = DDL_BASE_STATUS_OK;
 
     } else {
       processStatus = DDL_BASE_STATUS_BUSY;
