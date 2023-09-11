@@ -18,16 +18,16 @@
 
 #define SAMPLE_DATA_ARRAY_SIZE 10
 
-static fill_array_random(float* pFloatArray, int floatArraySize);
+static int fill_array_random(int* pIntArray, int intArraySize);
 
-float filterInputDataArray[SAMPLE_DATA_ARRAY_SIZE] = {0};
+int filterInputDataArray[SAMPLE_DATA_ARRAY_SIZE] = {0};
 
 void main(int argc, char* argv[]) {
   fill_array_random(filterInputDataArray, SAMPLE_DATA_ARRAY_SIZE);
 }
 
-static int fill_array_random(float* pFloatArray, int floatArraySize) {
-  if (!pFloatArray || !floatArraySize) {
+static int fill_array_random(int* pIntArray, int intArraySize) {
+  if (!pIntArray || !intArraySize) {
     return -1;
   }
 
@@ -37,8 +37,16 @@ static int fill_array_random(float* pFloatArray, int floatArraySize) {
         SAMPLE_VALUE_LOWEST;
   }
 
-  printf("Sample array:\r\n");
+  printf("\nSample array:\r\n");
   for (size_t i = 0; i < SAMPLE_DATA_ARRAY_SIZE; i++) {
-    printf("filterInputDataArray[%d]= %4.2f\n", i, filterInputDataArray[i]);
+    printf("filterInputDataArray[%d]= %4.2d\n", i, filterInputDataArray[i]);
+  }
+
+  // Function Call
+  timSort(filterInputDataArray, SAMPLE_DATA_ARRAY_SIZE);
+
+  printf("\nSorted Array:\n");
+  for (size_t i = 0; i < SAMPLE_DATA_ARRAY_SIZE; i++) {
+    printf("filterInputDataArray[%d]= %4.2d\n", i, filterInputDataArray[i]);
   }
 }
