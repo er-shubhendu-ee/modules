@@ -8,7 +8,8 @@
         "ddl_queue.h": "c",
         "string.h": "c",
         "type_traits": "c",
-        "ddl_commons.h": "c"
+        "ddl_commons.h": "c",
+        "digitalv.h": "c"
     },
     "C_Cpp.default.customConfigurationVariables": {},
     "C_Cpp.default.includePath": [
