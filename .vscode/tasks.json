@@ -7,11 +7,11 @@
             "command": "C:\\msys64\\mingw64\\bin\\gcc.exe",
             "args": [
                 "-fdiagnostics-color=always",
+                "-I${workspaceFolder}",
                 "-g",
                 "${workspaceFolder}\\*.c",
-                //"${workspaceFolder}\\*.cpp",
                 "-o",
-                "${workspaceFolder}\\queue-testing.exe"
+                "${workspaceFolder}\\queue.exe"
             ],
             "options": {
                 "cwd": "C:\\msys64\\mingw64\\bin"
