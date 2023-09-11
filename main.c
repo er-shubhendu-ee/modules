@@ -12,6 +12,7 @@
 #include <stdlib.h>
 
 #include "digital-filters.h"
+#include "search-sorts.h"
 
 #define SAMPLE_VALUE_LOWEST 100
 #define SAMPLE_VALUE_HIGHEST 150

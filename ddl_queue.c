@@ -12,6 +12,8 @@
 
 #include "ddl_queue.h"
 
+#include <string.h>
+
 // #ifndef LOG_LEVEL_VERBOSE
 // #define LOG_LEVEL_VERBOSE
 // #endif

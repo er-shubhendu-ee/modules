@@ -17,7 +17,8 @@
         "latch": "c",
         "limits": "c",
         "semaphore": "c",
-        "valarray": "c"
+        "valarray": "c",
+        "search-sorts.h": "c"
     },
     "C_Cpp.default.customConfigurationVariables": {},
     "C_Cpp.default.includePath": [
