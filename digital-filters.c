@@ -31,11 +31,11 @@ int digital_filter_mode(int *pInputArray, int inputArraySize) {
     return 0;
   }
 
-  printf("\nInput Array to mode filter:\n");
-  for (size_t i = 0; i < inputArraySize; i++) {
-    printf("filterInputDataArray[%d]= %4.2d\n", i,
-           (int)*((int *)pInputArray + i));
-  }
+  //   printf("\nInput Array to mode filter:\n");
+  //   for (size_t i = 0; i < inputArraySize; i++) {
+  //     printf("filterInputDataArray[%d]= %4.2d\n", i,
+  //            (int)*((int *)pInputArray + i));
+  //   }
 
   memset(dataBuffTemp, 0, sizeof(dataBuffTemp));
 
@@ -65,27 +65,27 @@ int digital_filter_mode(int *pInputArray, int inputArraySize) {
     // inputArrayIndexProcessed);
   }
 
-  for (size_t i = 0; i < tempIndexUsed; i++) {
-    printf("dataBuffTemp[%d]\r\n", i);
-    for (size_t j = 0; j < 2; j++) {
-      printf("[%d]: %d\r\n", j, dataBuffTemp[i][j]);
-    }
-  }
+  //   for (size_t i = 0; i < tempIndexUsed; i++) {
+  //     printf("dataBuffTemp[%d]\r\n", i);
+  //     for (size_t j = 0; j < 2; j++) {
+  //       printf("[%d]: %d\r\n", j, dataBuffTemp[i][j]);
+  //     }
+  //   }
 
   int maxAtIndexTempBuff = 0;
   int resultIndex = dataBuffTemp[0][0];
   for (size_t scanIndexTemp = 0; scanIndexTemp < tempIndexUsed - 1;
        scanIndexTemp++) {
-    printf("comparing [%d][1]:%d with [%d][1]:%d\r\n", maxAtIndexTempBuff,
-           dataBuffTemp[maxAtIndexTempBuff][1], scanIndexTemp + 1,
-           dataBuffTemp[scanIndexTemp + 1][1]);
+    // printf("comparing [%d][1]:%d with [%d][1]:%d\r\n", maxAtIndexTempBuff,
+    //        dataBuffTemp[maxAtIndexTempBuff][1], scanIndexTemp + 1,
+    //        dataBuffTemp[scanIndexTemp + 1][1]);
 
     if (dataBuffTemp[maxAtIndexTempBuff][1] <
         dataBuffTemp[scanIndexTemp + 1][1]) {
       maxAtIndexTempBuff = scanIndexTemp + 1;
       resultIndex = dataBuffTemp[maxAtIndexTempBuff][0];
     }
-    printf("result index: %d\r\n", resultIndex);
+    // printf("result index: %d\r\n", resultIndex);
   }
 
   return (int)*((int *)pInputArray + resultIndex);

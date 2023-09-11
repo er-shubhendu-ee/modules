@@ -14,7 +14,7 @@
 #include "digital-filters.h"
 
 #define SAMPLE_VALUE_LOWEST 100
-#define SAMPLE_VALUE_HIGHEST 110
+#define SAMPLE_VALUE_HIGHEST 150
 
 #define SAMPLE_DATA_ARRAY_SIZE 10
 
@@ -49,7 +49,13 @@ void main(int argc, char* argv[]) {
         digital_filter_mode(filterInputDataArray, SAMPLE_DATA_ARRAY_SIZE);
 
     printf("\nfilteredValue(median filter): %4.2d\n", filteredValue_median);
-    printf("\nfilteredValue(mode filter): %4.2d\n", filteredValue_mode);
+    printf("filteredValue(mode filter): %4.2d\n", filteredValue_mode);
+    printf("mod-median difference: %4.2d\n",
+           (filteredValue_median > filteredValue_mode)
+               ? filteredValue_median - filteredValue_mode
+               : filteredValue_mode - filteredValue_median);
+    printf("filteredValue(mode-median avg filter): %4.2d\n",
+           (filteredValue_median + filteredValue_mode) / 2);
   }
 }
 
