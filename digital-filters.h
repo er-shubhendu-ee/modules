@@ -18,6 +18,9 @@
 extern "C" {
 #endif
 
+int digital_filter_median(int *pInputArray, int inputArraySize);
+int digital_filter_mode(int *pInputArray, int inputArraySize);
+
 #ifdef __cplusplus
 }
 #endif
