@@ -12,6 +12,8 @@
 #ifndef __DDL_QUEUE_H__
 #define __DDL_QUEUE_H__
 
+#include <stdio.h>
+
 #include "ddl_base.h"
 
 typedef struct {
