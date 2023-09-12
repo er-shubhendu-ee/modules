@@ -18,7 +18,8 @@
         "limits": "c",
         "semaphore": "c",
         "valarray": "c",
-        "search-sorts.h": "c"
+        "search-sorts.h": "c",
+        "stdio.h": "c"
     },
     "C_Cpp.default.customConfigurationVariables": {},
     "C_Cpp.default.includePath": [

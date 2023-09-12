@@ -11,7 +11,7 @@
                 "-g",
                 "${workspaceFolder}\\*.c",
                 "-o",
-                "${workspaceFolder}\\digital-filter.exe"
+                "${workspaceFolder}\\filter.exe"
             ],
             "options": {
                 "cwd": "C:\\msys64\\mingw64\\bin"
