@@ -10,13 +10,14 @@
  **/
 
 #include "ddl_filter.h"
-#include "ddl_ss.h"
 
 #include <stdlib.h>
 #include <string.h>
 
+#include "ddl_ss.h"
+
 #define DATA_BUFF_TEMP_SIZE 100
-static int dataBuffTemp [ DATA_BUFF_TEMP_SIZE ][ 2 ] = { 0 };
+static int dataBuffTemp [ DATA_BUFF_TEMP_SIZE ][ 2 ] = { {0}, {0} };
 
 static int filter_median(int* pInputArray, int inputArraySize);
 static int filter_mode(int* pInputArray, int inputArraySize);
@@ -27,7 +28,6 @@ static int filter_median(int* pInputArray, int inputArraySize) {
     }
     return ( int ) *(( int* ) pInputArray + (inputArraySize / 2));
 }
-
 
 static int filter_mode(int* pInputArray, int inputArraySize) {
     if ( !pInputArray || !inputArraySize ||
@@ -106,8 +106,6 @@ int ddl_filter_median(int* pInputArray, int inputArraySize) {
     return filter_median(pInputArray, inputArraySize);
 }
 
-
-
 int ddl_filter_mode(int* pInputArray, int inputArraySize) {
     if ( !pInputArray || !inputArraySize ) {
         return 0;
@@ -122,7 +120,6 @@ int ddl_filter_mode(int* pInputArray, int inputArraySize) {
 int ddl_filter_memo_avg(int* pInputArray, int inputArraySize) {
     int filteredValue_median = 0;
     int filteredValue_mode = 0;
-    int filteredValue_memo_avg = 0;
 
     if ( !pInputArray || !inputArraySize ) {
         return 0;
@@ -140,5 +137,5 @@ int ddl_filter_memo_avg(int* pInputArray, int inputArraySize) {
     //     ? filteredValue_median - filteredValue_mode
     //     : filteredValue_mode - filteredValue_median);
 
-    return((filteredValue_median + filteredValue_mode) / 2);
+    return ((filteredValue_median + filteredValue_mode) / 2);
 }
