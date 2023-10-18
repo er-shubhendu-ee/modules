@@ -21,7 +21,7 @@
 
 #define TAG "DDL_TASK"
 #define DDL_TASK_LOG_LEVEL CONFIG_LOG_LEVEL
-#define DDL_TASK_LIST_SIZE CONFIG_DDL_TASK_LIST_SIZE
+#define DDL_TASK_MEMORY_MODEL_IS_DYNAMIC CONFIG_MEMORY_MODEL_IS_DYNAMIC
 
 
 typedef struct taskEntryStruct {
@@ -34,21 +34,32 @@ typedef struct taskEntryStruct {
 
 static ddl_queue_handle_t eventQueueHandle = NULL;
 static ddl_evt_t eventQueue [ CONFIG_DDL_EVT_QUEUE_SIZE ] = { 0 };
-static task_entry_t taskList [ DDL_TASK_LIST_SIZE ] = { 0 };
+static task_entry_t taskList [ CONFIG_DDL_TASK_LIST_SIZE ] = { 0 };
 static int taskEntryLast = 0;
 
 static int process_evt(ddl_evt_t *const pEvent);
 
-int ddl_task_init(void) {
+int ddl_task_init(ddl_task_t *pTaskList) {
     int processStatus = NO_ERROR;
     /* Init code goes here */
+    if ( !pTaskList ) {
+#if DDL_TASK_LOG_LEVEL>=DDL_LOG_LEVEL_INFO
+        DDL_LOGW(TAG, "Task list empty.");
+#endif       
+        goto label_exitPoint;
+    }
+
     memset((void *) eventQueue, 0, sizeof(eventQueue));
     memset((void *) taskList, 0, sizeof(taskList));
 
+#if (!DDL_TASK_MEMORY_MODEL_IS_DYNAMIC)
     eventQueueHandle = ddl_queue_create_static(sizeof(ddl_evt_t), CONFIG_DDL_EVT_QUEUE_SIZE, (uint8_t *) eventQueue);
+#else
+    eventQueueHandle = ddl_queue_create(sizeof(ddl_evt_t), CONFIG_DDL_EVT_QUEUE_SIZE, (uint8_t *) eventQueue);
+#endif
 
     if ( !eventQueueHandle ) {
-#if DDL_TASK_LOG_LEVEL>=LOG_LEVEL_ERROR
+#if DDL_TASK_LOG_LEVEL>=DDL_LOG_LEVEL_ERROR
         DDL_LOGE(TAG, "Failed to get eventQueueHandle");
 #endif
         processStatus = ERROR_INVALID_HANDLE;
@@ -60,11 +71,11 @@ int ddl_task_init(void) {
     /* Init code finish */
 label_exitPoint:
     if ( NO_ERROR == processStatus ) {
-#if DDL_TASK_LOG_LEVEL>=LOG_LEVEL_VERBOSE
+#if DDL_TASK_LOG_LEVEL>=DDL_LOG_LEVEL_VERBOSE
         DDL_LOGI(TAG, "Task initialized.");
 #endif
     } else {
-#if DDL_TASK_LOG_LEVEL>=LOG_LEVEL_ERROR
+#if DDL_TASK_LOG_LEVEL>=DDL_LOG_LEVEL_ERROR
         DDL_LOGE(TAG, "Task init failed.");
 #endif
     }
@@ -81,11 +92,11 @@ int ddl_task_idle(void) {
     while ( DDL_BASE_STATUS_OK == queueReceived ) {
         queueReceived = ddl_queue_recv(eventQueueHandle, (void *) &currentEvent);
         if ( (DDL_BASE_STATUS_OK == queueReceived) ) {
-#if DDL_TASK_LOG_LEVEL>=LOG_LEVEL_VERBOSE
+#if DDL_TASK_LOG_LEVEL>=DDL_LOG_LEVEL_VERBOSE
             process_evt(&currentEvent);
 #endif
         } else {
-#if DDL_TASK_LOG_LEVEL>=LOG_LEVEL_VERBOSE
+#if DDL_TASK_LOG_LEVEL>=DDL_LOG_LEVEL_VERBOSE
             DDL_LOGI(TAG, "Event queue empty.");
 #endif
         }
@@ -112,22 +123,22 @@ int ddl_task_reg_module(ddl_task_t moduleMain) {
     if ( 0 == taskEntryLast ) {
         taskList [ 0 ].thisEntry.task = moduleMain;
         taskEntryLast++;
-#if DDL_TASK_LOG_LEVEL>=LOG_LEVEL_VERBOSE
+#if DDL_TASK_LOG_LEVEL>=DDL_LOG_LEVEL_VERBOSE
         DDL_LOGI(TAG, "Module main registration success.");
 #endif
         goto label_exitPoint;
     }
 
-    if ( DDL_TASK_LIST_SIZE > taskEntryLast ) {
+    if ( CONFIG_DDL_TASK_LIST_SIZE > taskEntryLast ) {
         taskList [ taskEntryLast ].pPreviousEntry = &taskList [ taskEntryLast - 1 ];
         taskList [ taskEntryLast ].thisEntry.task = moduleMain;
-#if DDL_TASK_LOG_LEVEL>=LOG_LEVEL_VERBOSE
+#if DDL_TASK_LOG_LEVEL>=DDL_LOG_LEVEL_VERBOSE
         DDL_LOGI(TAG, "Module main registration success.");
 #endif
         goto label_exitPoint;
     } else {
         processStatus = ERROR_NOT_ENOUGH_MEMORY;
-#if DDL_TASK_LOG_LEVEL>=LOG_LEVEL_ERROR
+#if DDL_TASK_LOG_LEVEL>=DDL_LOG_LEVEL_ERROR
         DDL_LOGI(TAG, "Module main registration success.");
 #endif
         goto label_exitPoint;
@@ -153,13 +164,13 @@ static int process_evt(ddl_evt_t *const pEvent) {
 
     switch ( pEvent->eventType ) {
         case DDL_EVT_TYPE_ENTRY:
-#if DDL_TASK_LOG_LEVEL>=LOG_LEVEL_VERBOSE
+#if DDL_TASK_LOG_LEVEL>=DDL_LOG_LEVEL_VERBOSE
             DDL_LOGI(TAG, "Entry.");
 #endif
             break;
 
         case DDL_EVT_TYPE_TEST_1:
-#if DDL_TASK_LOG_LEVEL>=LOG_LEVEL_VERBOSE
+#if DDL_TASK_LOG_LEVEL>=DDL_LOG_LEVEL_VERBOSE
             DDL_LOGI(TAG, "DDL_EVT_TYPE_TEST_1.");
             if ( pEvent->dataBuffLen ) {
                 DDL_LOGI(TAG, "Received data, length: %d", pEvent->dataBuffLen);
@@ -174,13 +185,13 @@ static int process_evt(ddl_evt_t *const pEvent) {
             break;
 
         case DDL_EVT_TYPE_EXIT:
-#if DDL_TASK_LOG_LEVEL>=LOG_LEVEL_VERBOSE
+#if DDL_TASK_LOG_LEVEL>=DDL_LOG_LEVEL_VERBOSE
             DDL_LOGI(TAG, "Exit.");
 #endif
             break;
 
         default:
-#if DDL_TASK_LOG_LEVEL>=LOG_LEVEL_ERROR
+#if DDL_TASK_LOG_LEVEL>=DDL_LOG_LEVEL_ERROR
             DDL_LOGE(TAG, "Invalid event received, unable to process.");
 #endif
             break;

@@ -11,7 +11,8 @@
         "ddl_commons.h": "c",
         "app.h": "c",
         "error.h": "c",
-        "errors.h": "c"
+        "errors.h": "c",
+        "ddl_task.h": "c"
     },
     "C_Cpp.default.customConfigurationVariables": {},
     "C_Cpp.default.includePath": [

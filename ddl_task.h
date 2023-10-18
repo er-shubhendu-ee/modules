@@ -35,7 +35,7 @@ extern "C" {
      * @details
      *
     **/
-    int ddl_task_init(void);
+    int ddl_task_init(ddl_task_t *pTaskList);
 
     /*!
  * @fn         int ddl_task_idle(void)

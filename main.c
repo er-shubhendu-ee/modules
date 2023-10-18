@@ -14,17 +14,20 @@
 #include <string.h>
 
 #include "ddl_task.h"
+#include "module_1.h"
 
 
 #define TAG "MAIN"
 
 #define DELAY_COUNT_SET 0x0000F
 
-int delayCount = 0;
-uint8_t dataBuff [ 10 ] = { 1,2,3,4,5 };
+static int delayCount = 0;
+static uint8_t dataBuff [ 10 ] = { 1,2,3,4,5 };
+static ddl_task_t taskList [ 10 ] = { 0 };
 
 int main(void) {
-    ddl_task_init();
+    taskList [ 0 ] = module_1_task;
+    ddl_task_init(taskList);
 
     while ( 1 ) {
         if ( DELAY_COUNT_SET <= delayCount ) {
