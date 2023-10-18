@@ -39,7 +39,7 @@ static int taskEntryLast = 0;
 
 static int process_evt(ddl_evt_t *const pEvent);
 
-int ddl_task_init(ddl_task_t *pTaskList) {
+int ddl_task_init(const ddl_task_t *const pTaskList) {
     int processStatus = NO_ERROR;
     /* Init code goes here */
     if ( !pTaskList ) {
@@ -55,7 +55,7 @@ int ddl_task_init(ddl_task_t *pTaskList) {
 #if (!DDL_TASK_MEMORY_MODEL_IS_DYNAMIC)
     eventQueueHandle = ddl_queue_create_static(sizeof(ddl_evt_t), CONFIG_DDL_EVT_QUEUE_SIZE, (uint8_t *) eventQueue);
 #else
-    eventQueueHandle = ddl_queue_create(sizeof(ddl_evt_t), CONFIG_DDL_EVT_QUEUE_SIZE, (uint8_t *) eventQueue);
+    eventQueueHandle = ddl_queue_create(sizeof(ddl_evt_t), CONFIG_DDL_EVT_QUEUE_SIZE);
 #endif
 
     if ( !eventQueueHandle ) {
@@ -66,7 +66,9 @@ int ddl_task_init(ddl_task_t *pTaskList) {
         goto label_exitPoint;
     }
 
-    ddl_task_reg_module(module_1_task);
+    for ( size_t taskListIndex = 0; *(pTaskList + taskListIndex); taskListIndex++ ) {
+        ddl_task_reg_module(*(pTaskList + taskListIndex));
+    }
 
     /* Init code finish */
 label_exitPoint:

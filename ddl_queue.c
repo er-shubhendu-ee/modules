@@ -9,23 +9,23 @@
  *
  **/
 #include <string.h>
-
+#include "config.h"
 #include "ddl_queue.h"
 #include "ddl_log.h"
 
 
-#define PROJ_VER "0.0.5"
+#define PROJ_VER "0.0.6"
 #define TAG "DDL_QUEUE"
 
 #define DDL_QUEUE_LOG_LEVEL  LOG_LEVEL_INFO
 
-#define DDL_QUEUE_USE_STATIC 1
+#define DDL_QUEUE_USE_STATIC (!CONFIG_MEMORY_MODEL_IS_DYNAMIC)
 
-#if defined(DDL_QUEUE_USE_STATIC)
+#if (DDL_QUEUE_USE_STATIC)
 #define DDL_QUEUE_POOL_SIZE 10
 #endif
 
-#if defined(DDL_QUEUE_USE_STATIC)
+#if (DDL_QUEUE_USE_STATIC)
 #if defined(DDL_QUEUE_POOL_SIZE)
 ddl_queue_struct_t ddl_queue_pool [ DDL_QUEUE_POOL_SIZE ];
 #else
@@ -34,7 +34,7 @@ ddl_queue_struct_t ddl_queue_pool [ DDL_QUEUE_POOL_SIZE ];
 int nextAvailableSlotInPool = 0;
 #endif
 
-#if !defined(DDL_QUEUE_USE_STATIC)
+#if !(DDL_QUEUE_USE_STATIC)
 ddl_queue_handle_t ddl_queue_create(uint32_t elementCount,
     uint32_t elementSizeBytes) {
     DDL_LOGI(TAG, "%s : %d : using queue version: %s\n", __func__, __LINE__, PROJ_VER);
@@ -63,7 +63,7 @@ ddl_queue_handle_t ddl_queue_create(uint32_t elementCount,
 }
 #endif
 
-#if defined(DDL_QUEUE_USE_STATIC)
+#if (DDL_QUEUE_USE_STATIC)
 ddl_queue_handle_t ddl_queue_create_static(uint32_t elementSizeInBytes,
     uint32_t elementCount,
     uint8_t *pElementArray) {
@@ -246,7 +246,7 @@ ddl_base_status_t ddl_queue_delete(ddl_queue_handle_t queue) {
     ddl_base_status_t processStatus = DDL_BASE_STATUS_OK;
 
     if ( queue ) {
-#if !defined(DDL_QUEUE_USE_STATIC)
+#if !(DDL_QUEUE_USE_STATIC)
         free(queue);
 #else
         if ( (&ddl_queue_pool [ 0 ] > queue) ||
