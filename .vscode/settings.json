@@ -9,17 +9,10 @@
         "string.h": "c",
         "type_traits": "c",
         "ddl_commons.h": "c",
-        "digitalv.h": "c",
-        "digital-filters.h": "c",
-        "barrier": "c",
-        "chrono": "c",
-        "random": "c",
-        "latch": "c",
-        "limits": "c",
-        "semaphore": "c",
-        "valarray": "c",
-        "search-sorts.h": "c",
-        "stdio.h": "c"
+        "app.h": "c",
+        "error.h": "c",
+        "errors.h": "c",
+        "ddl_task.h": "c"
     },
     "C_Cpp.default.customConfigurationVariables": {},
     "C_Cpp.default.includePath": [

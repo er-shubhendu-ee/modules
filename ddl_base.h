@@ -44,9 +44,9 @@
 #endif
 
 #define BIT_SHIFT(DWORD, BITPOSITION) ((DWORD) |= (1 << (BITPOSITION)))
-// #define bitclear(byte,nbit) ((byte) &= ~(1<<(nbit)))
-// #define bitflip(byte,nbit)  ((byte) ^=  (1<<(nbit)))
-// #define bitcheck(byte,nbit) ((byte) &   (1<<(nbit)))
+ // #define bitclear(byte,nbit) ((byte) &= ~(1<<(nbit)))
+ // #define bitflip(byte,nbit)  ((byte) ^=  (1<<(nbit)))
+ // #define bitcheck(byte,nbit) ((byte) &   (1<<(nbit)))
 
 #ifndef BYTE
 #define BYTE uint8_t
