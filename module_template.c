@@ -1,5 +1,5 @@
 /**
- * @file      module_3.c
+ * @file      module_template.c
  * @author:   Shubhendu B B
  * @date:     16/10/2023
  * @brief
@@ -11,14 +11,14 @@
 #include <error.h>
 
 #include "config.h"
-#include "module_3.h"
+#include "module_template.h"
 #include "ddl_log.h"
 
 #define MODULE_LOG_LEVEL CONFIG_LOG_LEVEL
 
-#define TAG "MODULE_3"
+#define TAG "MODULE_TEMPLATE"
 
-int module_3_task(void) {
+int module_template_task(void) {
     int processStatus = NO_ERROR;
 
 #if MODULE_LOG_LEVEL>=LOG_LEVEL_VERBOSE
