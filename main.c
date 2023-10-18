@@ -1,65 +1,48 @@
 /**
- * @file: main.c
+ * @file      main.c
  * @author:   Shubhendu B B
- * @date:     12/09/2023
+ * @date:     04/02/2023
  * @brief
  * @details
  *
  * @copyright
  *
  **/
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 
-#include <stdlib.h>
+#include "ddl_queue.h"
+#include "ddl_log.h"
+#include "app.h"
 
-#include "ddl_filter.h"
 
+#define TAG "MAIN"
 
-#define SAMPLE_VALUE_LOWEST 100
-#define SAMPLE_VALUE_HIGHEST 200
+#define DELAY_COUNT_SET 0x0000F
 
-#define SAMPLE_DATA_ARRAY_SIZE 10
+int delayCount = 0;
+uint8_t dataBuff [ 10 ] = { 1,2,3,4,5 };
 
-static int fill_array_random(int* pIntArray, int intArraySize, int lowerBound,
-    int upperBound);
+int main(void) {
+    app_init();
 
-int filterInputDataArray [ SAMPLE_DATA_ARRAY_SIZE ] = { 0 };
+    while ( 1 ) {
+        if ( DELAY_COUNT_SET <= delayCount ) {
+            delayCount = 0;
+            app_evt_t sampleEvent = { 0 };
+            sampleEvent.eventType = APP_EVT_TYPE_TEST_1;
+            sampleEvent.pDataBuff = dataBuff;
+            sampleEvent.dataBuffLen = (sizeof(dataBuff));
 
-int filteredValue_median = 0;
-int filteredValue_mode = 0;
-int filteredValue_memo_avg = 0;
+            app_post_evt(&sampleEvent);
+        } else {
+            delayCount++;
+        }
 
-void main(int argc, char* argv []) {
-    for ( int iterSize = 0; iterSize < 10; iterSize++ ) {
-        fill_array_random(filterInputDataArray, SAMPLE_DATA_ARRAY_SIZE,
-            SAMPLE_VALUE_LOWEST + iterSize,
-            SAMPLE_VALUE_HIGHEST + iterSize);
-
-        /* Take the middle value (median filter)*/
-        filteredValue_median =
-            ddl_filter_median(filterInputDataArray, SAMPLE_DATA_ARRAY_SIZE);
-
-        /* Take the middle value (mode filter)*/
-        filteredValue_mode =
-            ddl_filter_mode(filterInputDataArray, SAMPLE_DATA_ARRAY_SIZE);
-
-        /* Take the middle value (mode filter)*/
-        filteredValue_memo_avg =
-            ddl_filter_memo_avg(filterInputDataArray, SAMPLE_DATA_ARRAY_SIZE);
-
-        printf("\nfilteredValue(median filter): %4.2d\n", filteredValue_median);
-        printf("filteredValue(mode filter): %4.2d\n", filteredValue_mode);
-        printf("filteredValue(median mode avg filter): %4.2d\n", filteredValue_memo_avg);
-    }
-}
-
-static int fill_array_random(int* pIntArray, int intArraySize, int lowerBound,
-    int upperBound) {
-    if ( !pIntArray || !intArraySize ) {
-        return -1;
+        app_idle();
     }
 
-    for ( size_t i = 0; i < intArraySize; i++ ) {
-        filterInputDataArray [ i ] =
-            (rand() % (upperBound - lowerBound + 1)) + lowerBound;
-    }
+    return 0;
 }

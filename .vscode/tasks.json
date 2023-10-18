@@ -3,7 +3,7 @@
     "tasks": [
         {
             "type": "cppbuild",
-            "label": "C/C++: gcc.exe build active file",
+            "label": "C/C++: gcc.exe build app",
             "command": "C:\\msys64\\mingw64\\bin\\gcc.exe",
             "args": [
                 "-fdiagnostics-color=always",
@@ -11,7 +11,7 @@
                 "-g",
                 "${workspaceFolder}\\*.c",
                 "-o",
-                "${workspaceFolder}\\filter.exe"
+                "${workspaceFolder}\\event-app.exe"
             ],
             "options": {
                 "cwd": "C:\\msys64\\mingw64\\bin"
