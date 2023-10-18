@@ -11,13 +11,13 @@
 #include <string.h>
 
 #include "ddl_queue.h"
+#include "ddl_log.h"
 
 
 #define PROJ_VER "0.0.5"
+#define TAG "DDL_QUEUE"
 
- // #ifndef LOG_LEVEL_VERBOSE
- // #define LOG_LEVEL_VERBOSE
- // #endif
+#define DDL_QUEUE_LOG_LEVEL  LOG_LEVEL_INFO
 
 #define DDL_QUEUE_USE_STATIC 1
 
@@ -37,7 +37,7 @@ int nextAvailableSlotInPool = 0;
 #if !defined(DDL_QUEUE_USE_STATIC)
 ddl_queue_handle_t ddl_queue_create(uint32_t elementCount,
     uint32_t elementSizeBytes) {
-    printf("%s : %d : using queue version: %s\n", __func__, __LINE__, PROJ_VER);
+    DDL_LOGI(TAG, "%s : %d : using queue version: %s\n", __func__, __LINE__, PROJ_VER);
     ddl_queue_handle_t newQueue = NULL;
     if ( elementCount && elementSizeBytes ) {
         newQueue = malloc(sizeof(ddl_queue_struct_t));
@@ -50,13 +50,13 @@ ddl_queue_handle_t ddl_queue_create(uint32_t elementCount,
                 newQueue->elemSizeBytes = elementSizeBytes;
                 newQueue->front = newQueue->rear = -1;
             } else {
-                printf("%s : %d : error", __func__, __LINE__);
+                DDL_LOGI(TAG, "%s : %d : error", __func__, __LINE__);
             }
         } else {
-            printf("%s : %d : error", __func__, __LINE__);
+            DDL_LOGI(TAG, "%s : %d : error", __func__, __LINE__);
         }
     } else {
-        printf("%s : %d : error", __func__, __LINE__);
+        DDL_LOGI(TAG, "%s : %d : error", __func__, __LINE__);
     }
 
     return newQueue;
@@ -67,7 +67,7 @@ ddl_queue_handle_t ddl_queue_create(uint32_t elementCount,
 ddl_queue_handle_t ddl_queue_create_static(uint32_t elementSizeInBytes,
     uint32_t elementCount,
     uint8_t *pElementArray) {
-    printf("%s : %d : using queue version: %s\n", __func__, __LINE__, PROJ_VER);
+    DDL_LOGI(TAG, "%s : %d : using queue version: %s\n", __func__, __LINE__, PROJ_VER);
     ddl_queue_handle_t newQueue = NULL;
     if ( elementSizeInBytes && elementCount && pElementArray &&
         (DDL_QUEUE_POOL_SIZE > (nextAvailableSlotInPool + 1)) ) {
@@ -84,10 +84,10 @@ ddl_queue_handle_t ddl_queue_create_static(uint32_t elementSizeInBytes,
             newQueue->front = newQueue->rear = -1;
 
         } else {
-            printf("%s : %d : error", __func__, __LINE__);
+            DDL_LOGI(TAG, "%s : %d : error", __func__, __LINE__);
         }
     } else {
-        printf("%s : %d : error", __func__, __LINE__);
+        DDL_LOGI(TAG, "%s : %d : error", __func__, __LINE__);
     }
 
     return newQueue;
@@ -100,9 +100,9 @@ ddl_base_status_t ddl_queue_send(ddl_queue_handle_t queueHandle,
     bool isOkToPut = false;
 
 #if defined(LOG_LEVEL_VERBOSE)
-    printf("%s : %d : on entry front: %d\n", __func__, __LINE__,
+    DDL_LOGI(TAG, "%s : %d : on entry front: %d\n", __func__, __LINE__,
         queueHandle->front);
-    printf("%s : %d : on entry rear: %d\n", __func__, __LINE__,
+    DDL_LOGI(TAG, "%s : %d : on entry rear: %d\n", __func__, __LINE__,
         queueHandle->rear);
 #endif
 
@@ -135,7 +135,7 @@ ddl_base_status_t ddl_queue_send(ddl_queue_handle_t queueHandle,
 
             if ( isOkToPut ) {
 #if defined(LOG_LEVEL_VERBOSE)
-                printf("%s : %d : copy to %lu from %lu, %d bytes\n", __func__, __LINE__,
+                DDL_LOGI(TAG, "%s : %d : copy to %lu from %lu, %d bytes\n", __func__, __LINE__,
                     (uint8_t *) (queueHandle->pElementBuffer +
                         queueHandle->rear * queueHandle->elemSizeBytes),
                     (uint8_t *) pElement, queueHandle->elemSizeBytes);
@@ -165,9 +165,9 @@ label_exitPoint:
     queueHandle->isLocked = false;
 
 #if defined(LOG_LEVEL_VERBOSE)
-    printf("%s : %d : on exit front: %d\n", __func__, __LINE__,
+    DDL_LOGI(TAG, "%s : %d : on exit front: %d\n", __func__, __LINE__,
         queueHandle->front);
-    printf("%s : %d : on exit rear: %d\n", __func__, __LINE__, queueHandle->rear);
+    DDL_LOGI(TAG, "%s : %d : on exit rear: %d\n", __func__, __LINE__, queueHandle->rear);
 #endif
 
     return processStatus;
@@ -178,9 +178,9 @@ ddl_base_status_t ddl_queue_recv(ddl_queue_handle_t queueHandle,
     ddl_base_status_t processStatus = DDL_BASE_STATUS_OK;
 
 #if defined(LOG_LEVEL_VERBOSE)
-    printf("%s : %d : on entry front: %d\n", __func__, __LINE__,
+    DDL_LOGI(TAG, "%s : %d : on entry front: %d\n", __func__, __LINE__,
         queueHandle->front);
-    printf("%s : %d : on entry rear: %d\n", __func__, __LINE__,
+    DDL_LOGI(TAG, "%s : %d : on entry rear: %d\n", __func__, __LINE__,
         queueHandle->rear);
 #endif
 
@@ -190,14 +190,14 @@ ddl_base_status_t ddl_queue_recv(ddl_queue_handle_t queueHandle,
 
             if ( queueHandle->front == -1 ) {
 #if defined(LOG_LEVEL_VERBOSE)
-                printf("%s : %d : queue empty", __func__, __LINE__);
+                DDL_LOGI(TAG, "%s : %d : queue empty", __func__, __LINE__);
 #endif
                 processStatus = DDL_BASE_STATUS_ERROR;
                 goto label_exitPoint;
             }
 
 #if defined(LOG_LEVEL_VERBOSE)
-            printf("%s : %d : copy to %lu from %lu, %d bytes\n", __func__, __LINE__,
+            DDL_LOGI(TAG, "%s : %d : copy to %lu from %lu, %d bytes\n", __func__, __LINE__,
                 (uint8_t *) pBuffer,
                 (uint8_t *) (queueHandle->pElementBuffer +
                     queueHandle->rear * queueHandle->elemSizeBytes),
@@ -234,9 +234,9 @@ label_exitPoint:
     queueHandle->isLocked = false;
 
 #if defined(LOG_LEVEL_VERBOSE)
-    printf("%s : %d : on exit front: %d\n", __func__, __LINE__,
+    DDL_LOGI(TAG, "%s : %d : on exit front: %d\n", __func__, __LINE__,
         queueHandle->front);
-    printf("%s : %d : on exit rear: %d\n", __func__, __LINE__, queueHandle->rear);
+    DDL_LOGI(TAG, "%s : %d : on exit rear: %d\n", __func__, __LINE__, queueHandle->rear);
 #endif
 
     return processStatus;
@@ -276,6 +276,6 @@ void ddl_queue_print(ddl_queue_handle_t queue) {
         uint32_t *pValue = 0;
         pValue = (uint32_t *) ((uint8_t *) queue->pElementBuffer +
             (i * queue->elemSizeBytes));
-        printf("%s : %d : queue[%d]= %d, \r\n", __func__, __LINE__, i, *pValue);
+        DDL_LOGI(TAG, "%s : %d : queue[%d]= %d, \r\n", __func__, __LINE__, i, *pValue);
     }
 }

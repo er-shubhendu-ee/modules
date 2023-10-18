@@ -1,7 +1,7 @@
 /**
- * @file      app.h
+ * @file      ddl_task.h
  * @author:   Shubhendu B B
- * @date:     13/10/2023
+ * @date:     18/10/2023
  * @brief
  * @details
  *
@@ -14,27 +14,16 @@
 
 #include <stdint.h>
 
-typedef enum {
-    APP_EVT_TYPE_ENTRY = 0,
-    APP_EVT_TYPE_TEST_1,
-    APP_EVT_TYPE_TEST_2,
-    APP_EVT_TYPE_EXIT
-}app_evt_type_t;
+#include "ddl_evt.h"
 
-typedef struct {
-    app_evt_type_t eventType;
-    uint8_t *pDataBuff;
-    size_t dataBuffLen;
-}app_evt_t;
-
-typedef int(*app_module_task_t)(void);
+typedef int(*ddl_task_t)(void);
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
     /*!
-     * @fn         int app_init(void)
+     * @fn         int ddl_task_init(void)
      * @brief      Copies bytes from a source memory area to a destination memory area,
      *             where both areas may not overlap.
      *
@@ -46,10 +35,10 @@ extern "C" {
      * @details
      *
     **/
-    int app_init(void);
+    int ddl_task_init(void);
 
     /*!
- * @fn         int app_idle(void)
+ * @fn         int ddl_task_idle(void)
  * @brief      Idle task when nothing is running on
  *
  * @param[out] dest The memory area to copy to.
@@ -60,10 +49,10 @@ extern "C" {
  * @details
  *
 **/
-    int app_idle(void);
+    int ddl_task_idle(void);
 
     /*!
-     * @fn         int app_reg_module(app_module_task_t moduleSignature)
+     * @fn         int ddl_task_reg_module(ddl_task_t moduleSignature)
      * @brief      Copies bytes from a source memory area to a destination memory area,
      *             where both areas may not overlap.
      *
@@ -75,10 +64,10 @@ extern "C" {
      * @details
      *
     **/
-    int app_reg_module(app_module_task_t moduleSignature);
+    int ddl_task_reg_module(ddl_task_t moduleSignature);
 
     /*!
- * @fn         int app_post_evt(app_module_task_t taskToPost)
+ * @fn         int ddl_task_post_evt(ddl_task_t taskToPost)
  * @brief      Exposes functionality to post task to be executed by the idle task.
  *
  * @param[out] dest The memory area to copy to.
@@ -89,7 +78,7 @@ extern "C" {
  * @details
  *
 **/
-    int app_post_evt(app_evt_t *pAppEvent);
+    int ddl_task_post_evt(ddl_evt_t *pAppEvent);
 
 
 #ifdef __cplusplus
