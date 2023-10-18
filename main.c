@@ -15,6 +15,7 @@
 
 #include "ddl_task.h"
 #include "module_1.h"
+#include "module_2.h"
 
 
 #define TAG "MAIN"
@@ -27,6 +28,8 @@ static ddl_task_t taskList [ 10 ] = { 0 };
 
 int main(void) {
     taskList [ 0 ] = module_1_task;
+    taskList [ 1 ] = module_2_task;
+
     ddl_task_init(taskList);
 
     while ( 1 ) {

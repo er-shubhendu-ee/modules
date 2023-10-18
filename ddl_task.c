@@ -17,7 +17,6 @@
 #include "ddl_log.h"
 #include "ddl_queue.h"
 
-#include "module_1.h"
 
 #define TAG "DDL_TASK"
 #define DDL_TASK_LOG_LEVEL CONFIG_LOG_LEVEL
@@ -132,8 +131,11 @@ int ddl_task_reg_module(ddl_task_t moduleMain) {
     }
 
     if ( CONFIG_DDL_TASK_LIST_SIZE > taskEntryLast ) {
+        taskList [ taskEntryLast - 1 ].pNextEntry = &taskList [ taskEntryLast ];
+
         taskList [ taskEntryLast ].pPreviousEntry = &taskList [ taskEntryLast - 1 ];
         taskList [ taskEntryLast ].thisEntry.task = moduleMain;
+        taskEntryLast++;
 #if DDL_TASK_LOG_LEVEL>=DDL_LOG_LEVEL_VERBOSE
         DDL_LOGI(TAG, "Module main registration success.");
 #endif
