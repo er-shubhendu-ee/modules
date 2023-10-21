@@ -10,33 +10,35 @@
  **/
 #include <string.h>
 
+#include "config.h"
 #include "ddl_queue.h"
-
+#include "ddl_log.h"
 
 #define PROJ_VER "0.0.5"
 
- // #ifndef LOG_LEVEL_VERBOSE
- // #define LOG_LEVEL_VERBOSE
- // #endif
 
-#define DDL_QUEUE_USE_STATIC 1
+#define DDL_QUEUE_USE_STATIC CONFIG_QUEUE_USE_STATIC
 
-#if defined(DDL_QUEUE_USE_STATIC)
-#define DDL_QUEUE_POOL_SIZE 10
+#if defined(CONFIG_QUEUE_POOL_SIZE)
+#define DDL_QUEUE_POOL_SIZE CONFIG_QUEUE_POOL_SIZE
+#if (0>=CONFIG_QUEUE_POOL_SIZE)
+#error "Queue pool size can not be less than one"
+#endif
 #endif
 
-#if defined(DDL_QUEUE_USE_STATIC)
-#if defined(DDL_QUEUE_POOL_SIZE)
+
+#if (1<=DDL_QUEUE_USE_STATIC)
+#if (1<=DDL_QUEUE_POOL_SIZE)
 ddl_queue_struct_t ddl_queue_pool [ DDL_QUEUE_POOL_SIZE ];
 #else
-#error "DDL_QUEUE_POOL_SIZE not defined"
+#error "Queue pool size can not be less than one"
 #endif
 int nextAvailableSlotInPool = 0;
 #endif
 
-#if !defined(DDL_QUEUE_USE_STATIC)
-ddl_queue_handle_t ddl_queue_create(uint32_t elementCount,
-    uint32_t elementSizeBytes) {
+#if (1>DDL_QUEUE_USE_STATIC)
+ddl_queue_handle_t ddl_queue_create(uint32_t elementSizeBytes,
+    uint32_t elementCount) {
     printf("%s : %d : using queue version: %s\n", __func__, __LINE__, PROJ_VER);
     ddl_queue_handle_t newQueue = NULL;
     if ( elementCount && elementSizeBytes ) {
@@ -63,7 +65,7 @@ ddl_queue_handle_t ddl_queue_create(uint32_t elementCount,
 }
 #endif
 
-#if defined(DDL_QUEUE_USE_STATIC)
+#if (1<=DDL_QUEUE_USE_STATIC)
 ddl_queue_handle_t ddl_queue_create_static(uint32_t elementSizeInBytes,
     uint32_t elementCount,
     uint8_t *pElementArray) {
@@ -246,7 +248,7 @@ ddl_base_status_t ddl_queue_delete(ddl_queue_handle_t queue) {
     ddl_base_status_t processStatus = DDL_BASE_STATUS_OK;
 
     if ( queue ) {
-#if !defined(DDL_QUEUE_USE_STATIC)
+#if (1>DDL_QUEUE_USE_STATIC)
         free(queue);
 #else
         if ( (&ddl_queue_pool [ 0 ] > queue) ||
