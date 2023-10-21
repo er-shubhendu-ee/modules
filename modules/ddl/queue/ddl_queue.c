@@ -16,6 +16,7 @@
 
 #define PROJ_VER "0.0.5"
 
+#define QUEUE_LOG_LEVEL LOG_LEVEL_ERROR
 
 #define DDL_QUEUE_USE_STATIC CONFIG_QUEUE_USE_STATIC
 
@@ -101,7 +102,7 @@ ddl_base_status_t ddl_queue_send(ddl_queue_handle_t queueHandle,
     ddl_base_status_t processStatus = DDL_BASE_STATUS_OK;
     bool isOkToPut = false;
 
-#if defined(LOG_LEVEL_VERBOSE)
+#if (QUEUE_LOG_LEVEL>=LOG_LEVEL_VERBOSE)
     printf("%s : %d : on entry front: %d\n", __func__, __LINE__,
         queueHandle->front);
     printf("%s : %d : on entry rear: %d\n", __func__, __LINE__,
@@ -136,7 +137,7 @@ ddl_base_status_t ddl_queue_send(ddl_queue_handle_t queueHandle,
             }
 
             if ( isOkToPut ) {
-#if defined(LOG_LEVEL_VERBOSE)
+#if (QUEUE_LOG_LEVEL>=LOG_LEVEL_VERBOSE)
                 printf("%s : %d : copy to %lu from %lu, %d bytes\n", __func__, __LINE__,
                     (uint8_t *) (queueHandle->pElementBuffer +
                         queueHandle->rear * queueHandle->elemSizeBytes),
@@ -166,7 +167,7 @@ ddl_base_status_t ddl_queue_send(ddl_queue_handle_t queueHandle,
 label_exitPoint:
     queueHandle->isLocked = false;
 
-#if defined(LOG_LEVEL_VERBOSE)
+#if (QUEUE_LOG_LEVEL>=LOG_LEVEL_VERBOSE)
     printf("%s : %d : on exit front: %d\n", __func__, __LINE__,
         queueHandle->front);
     printf("%s : %d : on exit rear: %d\n", __func__, __LINE__, queueHandle->rear);
@@ -179,7 +180,7 @@ ddl_base_status_t ddl_queue_recv(ddl_queue_handle_t queueHandle,
     void *pBuffer) {
     ddl_base_status_t processStatus = DDL_BASE_STATUS_OK;
 
-#if defined(LOG_LEVEL_VERBOSE)
+#if (QUEUE_LOG_LEVEL>=LOG_LEVEL_VERBOSE)
     printf("%s : %d : on entry front: %d\n", __func__, __LINE__,
         queueHandle->front);
     printf("%s : %d : on entry rear: %d\n", __func__, __LINE__,
@@ -191,14 +192,14 @@ ddl_base_status_t ddl_queue_recv(ddl_queue_handle_t queueHandle,
             queueHandle->isLocked = true;
 
             if ( queueHandle->front == -1 ) {
-#if defined(LOG_LEVEL_VERBOSE)
+#if (QUEUE_LOG_LEVEL>=LOG_LEVEL_VERBOSE)
                 printf("%s : %d : queue empty", __func__, __LINE__);
 #endif
                 processStatus = DDL_BASE_STATUS_ERROR;
                 goto label_exitPoint;
             }
 
-#if defined(LOG_LEVEL_VERBOSE)
+#if (QUEUE_LOG_LEVEL>=LOG_LEVEL_VERBOSE)
             printf("%s : %d : copy to %lu from %lu, %d bytes\n", __func__, __LINE__,
                 (uint8_t *) pBuffer,
                 (uint8_t *) (queueHandle->pElementBuffer +
@@ -235,7 +236,7 @@ ddl_base_status_t ddl_queue_recv(ddl_queue_handle_t queueHandle,
 label_exitPoint:
     queueHandle->isLocked = false;
 
-#if defined(LOG_LEVEL_VERBOSE)
+#if (QUEUE_LOG_LEVEL>=LOG_LEVEL_VERBOSE)
     printf("%s : %d : on exit front: %d\n", __func__, __LINE__,
         queueHandle->front);
     printf("%s : %d : on exit rear: %d\n", __func__, __LINE__, queueHandle->rear);
