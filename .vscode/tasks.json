@@ -8,10 +8,18 @@
             "args": [
                 "-fdiagnostics-color=always",
                 "-I${workspaceFolder}",
+                "-I${workspaceFolder}\\modules\\",
+                "-I${workspaceFolder}\\modules\\module_1\\",
+                "-I${workspaceFolder}\\modules\\ddl\\base\\",
+                "-I${workspaceFolder}\\modules\\ddl\\queue\\",
+                "-I${workspaceFolder}\\modules\\ddl\\util\\",
                 "-g",
                 "${workspaceFolder}\\*.c",
+                "${workspaceFolder}\\modules\\module_1\\*.c",
+                "${workspaceFolder}\\modules\\ddl\\queue\\*.c",
+                "${workspaceFolder}\\modules\\ddl\\util\\*.c",
                 "-o",
-                "${workspaceFolder}\\event-app.exe"
+                "${workspaceFolder}\\build\\event-app.exe"
             ],
             "options": {
                 "cwd": "C:\\msys64\\mingw64\\bin"

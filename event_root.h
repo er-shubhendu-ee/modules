@@ -1,7 +1,7 @@
 /**
- * @file      ddl_task.h
+ * @file      event_root.h
  * @author:   Shubhendu B B
- * @date:     18/10/2023
+ * @date:     13/10/2023
  * @brief
  * @details
  *
@@ -9,21 +9,32 @@
  *
 **/
 
-#ifndef __APP_H__
-#define __APP_H__
+#ifndef __EVENT_ROOT_H__
+#define __EVENT_ROOT_H__
 
 #include <stdint.h>
 
-#include "ddl_evt.h"
+typedef enum {
+    EVENT_ROOT_EVT_TYPE_ENTRY = 0,
+    EVENT_ROOT_EVT_TYPE_TEST_1,
+    EVENT_ROOT_EVT_TYPE_TEST_2,
+    EVENT_ROOT_EVT_TYPE_EXIT
+}event_root_evt_type_t;
 
-typedef int(*ddl_task_t)(void);
+typedef struct {
+    event_root_evt_type_t eventType;
+    uint8_t *pDataBuff;
+    size_t dataBuffLen;
+}event_root_evt_t;
+
+typedef int(*event_root_module_task_t)(void);
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
     /*!
-     * @fn         int ddl_task_init(void)
+     * @fn         int event_root_init(void)
      * @brief      Copies bytes from a source memory area to a destination memory area,
      *             where both areas may not overlap.
      *
@@ -35,10 +46,10 @@ extern "C" {
      * @details
      *
     **/
-    int ddl_task_init(const ddl_task_t *const pTaskList);
+    int event_root_init(void);
 
     /*!
- * @fn         int ddl_task_idle(void)
+ * @fn         int event_root_idle(void)
  * @brief      Idle task when nothing is running on
  *
  * @param[out] dest The memory area to copy to.
@@ -49,10 +60,10 @@ extern "C" {
  * @details
  *
 **/
-    int ddl_task_idle(void);
+    int event_root_idle(void);
 
     /*!
-     * @fn         int ddl_task_reg_module(ddl_task_t moduleSignature)
+     * @fn         int event_root_reg_module(event_root_module_task_t moduleSignature)
      * @brief      Copies bytes from a source memory area to a destination memory area,
      *             where both areas may not overlap.
      *
@@ -64,10 +75,10 @@ extern "C" {
      * @details
      *
     **/
-    int ddl_task_reg_module(ddl_task_t moduleSignature);
+    int event_root_reg_module(event_root_module_task_t moduleSignature);
 
     /*!
- * @fn         int ddl_task_post_evt(ddl_task_t taskToPost)
+ * @fn         int event_root_post_evt(event_root_module_task_t taskToPost)
  * @brief      Exposes functionality to post task to be executed by the idle task.
  *
  * @param[out] dest The memory area to copy to.
@@ -78,7 +89,7 @@ extern "C" {
  * @details
  *
 **/
-    int ddl_task_post_evt(ddl_evt_t *pAppEvent);
+    int event_root_post_evt(event_root_evt_t *pEvent_rootEvent);
 
 
 #ifdef __cplusplus
@@ -88,4 +99,4 @@ extern "C" {
 
 
 
-#endif /* @end  __APP_H__*/
+#endif /* @end  __EVENT_ROOT_H__*/
