@@ -3,15 +3,23 @@
     "tasks": [
         {
             "type": "cppbuild",
-            "label": "C/C++: gcc.exe build active file",
+            "label": "C/C++: gcc.exe build app",
             "command": "C:\\msys64\\mingw64\\bin\\gcc.exe",
             "args": [
                 "-fdiagnostics-color=always",
                 "-I${workspaceFolder}",
+                "-I${workspaceFolder}\\modules\\",
+                "-I${workspaceFolder}\\modules\\ddl\\base\\",
+                "-I${workspaceFolder}\\modules\\ddl\\queue\\",
+                "-I${workspaceFolder}\\modules\\ddl\\util\\",
+                "-I${workspaceFolder}\\modules\\ddl\\filter\\",
                 "-g",
                 "${workspaceFolder}\\*.c",
+                "${workspaceFolder}\\modules\\ddl\\queue\\*.c",
+                "${workspaceFolder}\\modules\\ddl\\util\\*.c",
+                "${workspaceFolder}\\modules\\ddl\\filter\\*.c",
                 "-o",
-                "${workspaceFolder}\\filter.exe"
+                "${workspaceFolder}\\build\\event-app.exe"
             ],
             "options": {
                 "cwd": "C:\\msys64\\mingw64\\bin"
