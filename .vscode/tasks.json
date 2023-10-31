@@ -13,11 +13,13 @@
                 "-I${workspaceFolder}\\modules\\ddl\\base\\",
                 "-I${workspaceFolder}\\modules\\ddl\\queue\\",
                 "-I${workspaceFolder}\\modules\\ddl\\util\\",
+                "-I${workspaceFolder}\\modules\\ddl\\evt\\",
                 "-g",
                 "${workspaceFolder}\\*.c",
                 "${workspaceFolder}\\modules\\module_1\\*.c",
                 "${workspaceFolder}\\modules\\ddl\\queue\\*.c",
                 "${workspaceFolder}\\modules\\ddl\\util\\*.c",
+                "${workspaceFolder}\\modules\\ddl\\evt\\*.c",
                 "-o",
                 "${workspaceFolder}\\build\\event-app.exe"
             ],
