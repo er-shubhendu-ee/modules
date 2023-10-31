@@ -14,6 +14,12 @@
 
 #include <stdint.h>
 
+typedef enum {
+    DDL_EVT_IDLE,
+    DDL_EVT_RUN,
+    DDL_EVT_EXIT,
+}ddl_evt_type_t;
+
 /*!
  * @typedef		ddl_evt_module_t
  * @brief       module event handler function
@@ -23,8 +29,8 @@
 typedef int(*ddl_evt_module_t)(void *pEvent);
 
 typedef struct {
-    int eventType;
-    ddl_evt_module_t module;
+    ddl_evt_type_t eventType;
+    ddl_evt_module_t nextModule;
     uint8_t *pDataBuff;
     size_t dataBuffLen;
 }ddl_evt_t;
@@ -50,7 +56,7 @@ extern "C" {
     int ddl_evt_init(void);
 
     /*!
- * @fn         int ddl_evt_idle(void)
+ * @fn         int ddl_evt_consumer(void)
  * @brief      Idle module when nothing is running on
  *
  * @param[out] dest The memory area to copy to.
@@ -61,7 +67,7 @@ extern "C" {
  * @details
  *
 **/
-    int ddl_evt_idle(void);
+    int ddl_evt_consumer(void);
 
     /*!
      * @fn         int ddl_evt_reg_module(ddl_evt_module_t moduleSignature)

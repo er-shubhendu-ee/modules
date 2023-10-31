@@ -64,7 +64,7 @@ int main(void) {
             loopCount++;
         }
 
-        ddl_evt_idle();
+        ddl_evt_consumer();
     }
 
     return 0;

@@ -36,7 +36,6 @@ static task_entry_t taskList [ DDL_EVT_TASK_LIST_SIZE ] = { 0 };
 static int taskEntryLast = 0;
 
 
-
 int ddl_evt_init(void) {
     int processStatus = NO_ERROR;
     /* Init code goes here */
@@ -69,7 +68,7 @@ label_exitPoint:
 }
 
 
-int ddl_evt_idle(void) {
+int ddl_evt_consumer(void) {
     int processStatus = NO_ERROR;
     ddl_base_status_t queueReceived = DDL_BASE_STATUS_OK;
     ddl_evt_t currentEvent = { 0 };
@@ -83,14 +82,25 @@ int ddl_evt_idle(void) {
             break;
         }
 
-        if ( !currentEvent.module ) {
-#if DDL_EVT_LOG_LEVEL>=LOG_LEVEL_ERROR
-            DDL_LOGI(TAG, "No module to process for the received event %d.", currentEvent.eventType);
-#endif
-            continue;
-        }
+        switch ( currentEvent.eventType ) {
+            case DDL_EVT_IDLE:
+                if ( currentEvent.nextModule ) {
+                    currentEvent.nextModule(&currentEvent);
+                }
+                break;
 
-        currentEvent.module(&currentEvent);
+            case DDL_EVT_RUN:
+                if ( currentEvent.nextModule ) {
+                    currentEvent.nextModule(&currentEvent);
+                }
+                break;
+
+            case DDL_EVT_EXIT:
+                break;
+
+            default:
+                break;
+        }
     }
 
 label_exitPoint:
