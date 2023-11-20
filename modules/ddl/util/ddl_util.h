@@ -163,6 +163,10 @@ extern "C" {
         const char *ketValueSeperator, const char *dataSeperator);
 
 
+    void ddl_util_timSort(int arr [], int n);
+
+    float __attribute__((inline))  ddl_util_normalize(float valueMin, float valueMax, float valueMid, float valueIn, int roundToDecimal);
+    float __attribute__((inline))  ddl_util_scale(float valueMin, float valueMax, float valueMid, float normalizedValueIn, int roundToDecimal);
 
 #ifdef __cplusplus
 }
