@@ -5,7 +5,7 @@
             "name": "C/C++: g++.exe build and debug app",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}\\event-app.exe",
+            "program": "${workspaceFolder}\\build\\event-app.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

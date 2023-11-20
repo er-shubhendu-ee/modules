@@ -12,7 +12,17 @@
         "app.h": "c",
         "error.h": "c",
         "errors.h": "c",
-        "ddl_task.h": "c"
+        "stdint.h": "c",
+        "ddl_evt.h": "c",
+        "module_1.h": "c",
+        "bit": "c",
+        "cstddef": "c",
+        "string": "c",
+        "optional": "c",
+        "limits": "c",
+        "memory": "c",
+        "new": "c",
+        "functional": "c"
     },
     "C_Cpp.default.customConfigurationVariables": {},
     "C_Cpp.default.includePath": [

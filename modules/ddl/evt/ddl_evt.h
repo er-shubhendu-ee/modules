@@ -1,7 +1,7 @@
 /**
- * @file      ddl_task.h
+ * @file      ddl_evt.h
  * @author:   Shubhendu B B
- * @date:     18/10/2023
+ * @date:     13/10/2023
  * @brief
  * @details
  *
@@ -9,21 +9,39 @@
  *
 **/
 
-#ifndef __APP_H__
-#define __APP_H__
+#ifndef __DDL_EVT_H__
+#define __DDL_EVT_H__
 
 #include <stdint.h>
 
-#include "ddl_evt.h"
+typedef enum {
+    DDL_EVT_IDLE,
+    DDL_EVT_RUN,
+    DDL_EVT_EXIT,
+}ddl_evt_type_t;
 
-typedef int(*ddl_task_t)(void);
+/*!
+ * @typedef		ddl_evt_module_t
+ * @brief       nextModule event handler function
+ * @details
+ *
+ **/
+typedef int(*ddl_evt_module_t)(void *pEvent);
+
+typedef struct {
+    ddl_evt_type_t eventType;
+    ddl_evt_module_t nextModule;
+    uint8_t *pDataBuff;
+    size_t dataBuffLen;
+}ddl_evt_t;
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
     /*!
-     * @fn         int ddl_task_init(void)
+     * @fn         int ddl_evt_init(void)
      * @brief      Copies bytes from a source memory area to a destination memory area,
      *             where both areas may not overlap.
      *
@@ -35,11 +53,11 @@ extern "C" {
      * @details
      *
     **/
-    int ddl_task_init(const ddl_task_t *const pTaskList);
+    int ddl_evt_init(void);
 
     /*!
- * @fn         int ddl_task_idle(void)
- * @brief      Idle task when nothing is running on
+ * @fn         int ddl_evt_consumer(void)
+ * @brief      Idle nextModule when nothing is running on
  *
  * @param[out] dest The memory area to copy to.
  * @param[in]  src  The memory area to copy from.
@@ -49,10 +67,10 @@ extern "C" {
  * @details
  *
 **/
-    int ddl_task_idle(void);
+    int ddl_evt_consumer(void);
 
     /*!
-     * @fn         int ddl_task_reg_module(ddl_task_t moduleSignature)
+     * @fn         int ddl_evt_reg_module(ddl_evt_module_t moduleSignature)
      * @brief      Copies bytes from a source memory area to a destination memory area,
      *             where both areas may not overlap.
      *
@@ -64,11 +82,11 @@ extern "C" {
      * @details
      *
     **/
-    int ddl_task_reg_module(ddl_task_t moduleSignature);
+    int ddl_evt_reg_module(ddl_evt_module_t moduleSignature);
 
     /*!
- * @fn         int ddl_task_post_evt(ddl_task_t taskToPost)
- * @brief      Exposes functionality to post task to be executed by the idle task.
+ * @fn         int ddl_evt_post(ddl_evt_module_t taskToPost)
+ * @brief      Exposes functionality to post nextModule to be executed by the idle nextModule.
  *
  * @param[out] dest The memory area to copy to.
  * @param[in]  src  The memory area to copy from.
@@ -78,14 +96,10 @@ extern "C" {
  * @details
  *
 **/
-    int ddl_task_post_evt(ddl_evt_t *pAppEvent);
-
+    int ddl_evt_post(ddl_evt_t *pDdl_evtEvent);
 
 #ifdef __cplusplus
 }
 #endif
 
-
-
-
-#endif /* @end  __APP_H__*/
+#endif /* @end  __DDL_EVT_H__*/

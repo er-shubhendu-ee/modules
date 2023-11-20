@@ -13,36 +13,58 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "ddl_task.h"
-#include "module_1.h"
-
+#include "ddl_queue.h"
+#include "ddl_log.h"
+#include "ddl_evt.h"
+#include "module_template_1.h"
 
 #define TAG "MAIN"
 
-#define DELAY_COUNT_SET 0x0000F
+enum {
+    LOOP_COUNT_SET_1 = 0x0000F,
+    LOOP_COUNT_SET_2 = 0x0001F,
+    LOOP_COUNT_SET_3 = 0x0002F,
+    LOOP_COUNT_SET_4 = 0x0003F,
+    LOOP_COUNT_MAX
+}loop_count_set_t;
 
-static int delayCount = 0;
-static uint8_t dataBuff [ 10 ] = { 1,2,3,4,5 };
-static ddl_task_t taskList [ 10 ] = { 0 };
+int loopCount = 0;
+uint8_t dataBuff [ 10 ] = { 1,2,3,4,5,6,7,8,9,10 };
 
 int main(void) {
-    taskList [ 0 ] = module_1_task;
-    ddl_task_init(taskList);
+    ddl_evt_init();
+    ddl_evt_reg_module(module_template_1_task);
 
     while ( 1 ) {
-        if ( DELAY_COUNT_SET <= delayCount ) {
-            delayCount = 0;
-            ddl_evt_t sampleEvent = { 0 };
-            sampleEvent.eventType = DDL_EVT_TYPE_TEST_1;
-            sampleEvent.pDataBuff = dataBuff;
-            sampleEvent.dataBuffLen = (sizeof(dataBuff));
-
-            ddl_task_post_evt(&sampleEvent);
+        if ( LOOP_COUNT_MAX <= loopCount ) {
+            loopCount = 0;
         } else {
-            delayCount++;
+            ddl_evt_t sampleEvent = { 0 };
+            sampleEvent.nextModule = module_template_1_task;
+
+            switch ( loopCount ) {
+                case LOOP_COUNT_SET_1:
+                    sampleEvent.eventType = MODULE_TEMPLATE_1_EVT_TYPE_TEST_1;
+                    sampleEvent.pDataBuff = dataBuff;
+                    sampleEvent.dataBuffLen = (sizeof(dataBuff));
+                    ddl_evt_post(&sampleEvent);
+                    break;
+
+                case LOOP_COUNT_SET_2:
+                    sampleEvent.eventType = MODULE_TEMPLATE_1_EVT_TYPE_TEST_2;
+                    ddl_evt_post(&sampleEvent);
+                    break;
+
+                case LOOP_COUNT_SET_3:
+                    break;
+
+                default:
+                    break;
+            }
+            loopCount++;
         }
 
-        ddl_task_idle();
+        ddl_evt_consumer();
     }
 
     return 0;
