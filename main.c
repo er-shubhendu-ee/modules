@@ -1,71 +1,77 @@
 /**
  * @file      main.c
  * @author:   Shubhendu B B
- * @date:     04/02/2023
+ * @date:     18/05/2023
  * @brief
  * @details
  *
  * @copyright
  *
  **/
-#include <stddef.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
 
+#include "app.h"
 #include "ddl_queue.h"
-#include "ddl_log.h"
-#include "ddl_evt.h"
-#include "module_template_1.h"
 
-#define TAG "MAIN"
-
-enum {
-    LOOP_COUNT_SET_1 = 0x0000F,
-    LOOP_COUNT_SET_2 = 0x0001F,
-    LOOP_COUNT_SET_3 = 0x0002F,
-    LOOP_COUNT_SET_4 = 0x0003F,
-    LOOP_COUNT_MAX
-}loop_count_set_t;
-
-int loopCount = 0;
-uint8_t dataBuff [ 10 ] = { 1,2,3,4,5,6,7,8,9,10 };
+app_logElementStruct_t logStorageStructArrayTemp [ LOG_STORAGE_COUNT_MAX ] = { 0 };
+ddl_queue_handle_t logStorageQueueHandle = NULL;
 
 int main(void) {
-    ddl_evt_init();
-    ddl_evt_reg_module(module_template_1_task);
+    app_logElementStruct_t queueElement = { 0 };
 
-    while ( 1 ) {
-        if ( LOOP_COUNT_MAX <= loopCount ) {
-            loopCount = 0;
-        } else {
-            ddl_evt_t sampleEvent = { 0 };
-            sampleEvent.nextModule = module_template_1_task;
+    printf("%s : %d : started!\r\n", __func__, __LINE__);
 
-            switch ( loopCount ) {
-                case LOOP_COUNT_SET_1:
-                    sampleEvent.eventType = MODULE_TEMPLATE_1_EVT_TYPE_TEST_1;
-                    sampleEvent.pDataBuff = dataBuff;
-                    sampleEvent.dataBuffLen = (sizeof(dataBuff));
-                    ddl_evt_post(&sampleEvent);
-                    break;
 
-                case LOOP_COUNT_SET_2:
-                    sampleEvent.eventType = MODULE_TEMPLATE_1_EVT_TYPE_TEST_2;
-                    ddl_evt_post(&sampleEvent);
-                    break;
+    logStorageQueueHandle = app_queue_init();
 
-                case LOOP_COUNT_SET_3:
-                    break;
-
-                default:
-                    break;
-            }
-            loopCount++;
-        }
-
-        ddl_evt_consumer();
+    if ( logStorageQueueHandle == NULL ) {
+        printf("%s : %d : Error creating queue.\r\n", __func__, __LINE__);
+        return -1;
     }
+
+    app_queue_put(1, 2, 3);
+    app_queue_put(4, 5, 6);
+    app_queue_put(7, 8, 9);
+    app_queue_put(10, 11, 12);
+    app_queue_put(13, 14, 15);
+    app_queue_put(16, 17, 18);
+
+    app_queue_get(logStorageStructArrayTemp, 1);
+
+    app_queue_put(19, 20, 21);
+
+    app_queue_get(logStorageStructArrayTemp, 1);
+
+    app_queue_put(22, 23, 24);
+
+    app_queue_get(logStorageStructArrayTemp, 1);
+
+    app_queue_put(25, 26, 27);
+
+    app_queue_get(logStorageStructArrayTemp, 1);
+
+    app_queue_put(28, 29, 30);
+    app_queue_put(31, 32, 33);
+
+    printf("%s : %d : %d logs read success.\r\n", __func__, __LINE__,
+        app_queue_get(logStorageStructArrayTemp, 1));
+
+    printf("%s : %d : %d logs read success.\r\n", __func__, __LINE__,
+        app_queue_get(logStorageStructArrayTemp, 3));
+
+    memset(&queueElement, 0, sizeof(queueElement));
+    if ( ddl_queue_recv(logStorageQueueHandle, &queueElement) ) {
+        printf("%s : %d : : Error: Failed to receive from queue.", __func__,
+            __LINE__);
+    }
+
+    // printf(
+    //     "%s : %d : received value queueElement.byte_1: %d, queueElement.word_1: "
+    //     "%d "
+    //     "queueElement.dword_1: %d\r\n",
+    //     __func__, __LINE__, queueElement.byte_1, queueElement.word_1,
+    //     queueElement.dword_1);
+
+    ddl_queue_delete(logStorageQueueHandle);
 
     return 0;
 }
