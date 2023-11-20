@@ -22,7 +22,7 @@ typedef enum {
 
 /*!
  * @typedef		ddl_evt_module_t
- * @brief       module event handler function
+ * @brief       nextModule event handler function
  * @details
  *
  **/
@@ -57,7 +57,7 @@ extern "C" {
 
     /*!
  * @fn         int ddl_evt_consumer(void)
- * @brief      Idle module when nothing is running on
+ * @brief      Idle nextModule when nothing is running on
  *
  * @param[out] dest The memory area to copy to.
  * @param[in]  src  The memory area to copy from.
@@ -86,7 +86,7 @@ extern "C" {
 
     /*!
  * @fn         int ddl_evt_post(ddl_evt_module_t taskToPost)
- * @brief      Exposes functionality to post module to be executed by the idle module.
+ * @brief      Exposes functionality to post nextModule to be executed by the idle nextModule.
  *
  * @param[out] dest The memory area to copy to.
  * @param[in]  src  The memory area to copy from.

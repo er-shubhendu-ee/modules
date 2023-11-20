@@ -26,7 +26,7 @@ typedef struct taskEntryStruct {
     struct taskEntryStruct *pPreviousEntry;
     struct taskEntryStruct *pNextEntry;
     struct {
-        ddl_evt_module_t module;
+        ddl_evt_module_t nextModule;
     }this;
 }task_entry_t;
 
@@ -34,6 +34,7 @@ static ddl_queue_handle_t eventQueueHandle = NULL;
 static ddl_evt_t eventQueue [ CONFIG_DDL_EVT_EVENT_QUEUE_SIZE ] = { 0 };
 static task_entry_t taskList [ DDL_EVT_TASK_LIST_SIZE ] = { 0 };
 static int taskEntryLast = 0;
+
 
 
 int ddl_evt_init(void) {
@@ -82,25 +83,14 @@ int ddl_evt_consumer(void) {
             break;
         }
 
-        switch ( currentEvent.eventType ) {
-            case DDL_EVT_IDLE:
-                if ( currentEvent.nextModule ) {
-                    currentEvent.nextModule(&currentEvent);
-                }
-                break;
-
-            case DDL_EVT_RUN:
-                if ( currentEvent.nextModule ) {
-                    currentEvent.nextModule(&currentEvent);
-                }
-                break;
-
-            case DDL_EVT_EXIT:
-                break;
-
-            default:
-                break;
+        if ( !currentEvent.nextModule ) {
+#if DDL_EVT_LOG_LEVEL>=LOG_LEVEL_ERROR
+            DDL_LOGI(TAG, "No nextModule to process for the received event %d.", currentEvent.eventType);
+#endif
+            continue;
         }
+
+        currentEvent.nextModule(&currentEvent);
     }
 
 label_exitPoint:
@@ -112,7 +102,7 @@ int ddl_evt_reg_module(ddl_evt_module_t moduleMain) {
     int processStatus = NO_ERROR;
 
     if ( 0 == taskEntryLast ) {
-        taskList [ 0 ].this.module = moduleMain;
+        taskList [ 0 ].this.nextModule = moduleMain;
         taskEntryLast++;
 #if DDL_EVT_LOG_LEVEL>=LOG_LEVEL_VERBOSE
         DDL_LOGI(TAG, "Module main registration success.");
@@ -122,7 +112,7 @@ int ddl_evt_reg_module(ddl_evt_module_t moduleMain) {
 
     if ( DDL_EVT_TASK_LIST_SIZE > taskEntryLast ) {
         taskList [ taskEntryLast ].pPreviousEntry = &taskList [ taskEntryLast - 1 ];
-        taskList [ taskEntryLast ].this.module = moduleMain;
+        taskList [ taskEntryLast ].this.nextModule = moduleMain;
 #if DDL_EVT_LOG_LEVEL>=LOG_LEVEL_VERBOSE
         DDL_LOGI(TAG, "Module main registration success.");
 #endif

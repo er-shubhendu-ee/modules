@@ -76,7 +76,7 @@ int module_template_1_task(void *pEvent) {
                 DDL_LOGI(TAG, "MODULE_TEMPLATE_1_EVT_TYPE_TEST_2");
 #endif
                 ddl_evt_t sampleEvent = { 0 };
-                sampleEvent.module = module_template_1_task;
+                sampleEvent.nextModule = module_template_1_task;
                 sampleEvent.eventType = MODULE_TEMPLATE_1_EVT_TYPE_EXIT;
                 ddl_evt_post(&sampleEvent);
             }

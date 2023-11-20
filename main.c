@@ -40,7 +40,7 @@ int main(void) {
             loopCount = 0;
         } else {
             ddl_evt_t sampleEvent = { 0 };
-            sampleEvent.module = module_template_1_task;
+            sampleEvent.nextModule = module_template_1_task;
 
             switch ( loopCount ) {
                 case LOOP_COUNT_SET_1:
