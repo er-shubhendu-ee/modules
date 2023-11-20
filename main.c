@@ -1,71 +1,39 @@
 /**
  * @file      main.c
  * @author:   Shubhendu B B
- * @date:     04/02/2023
+ * @date:     12/09/2023
  * @brief
  * @details
  *
  * @copyright
  *
  **/
-#include <stddef.h>
-#include <stdint.h>
 #include <stdio.h>
-#include <string.h>
+#include <stdlib.h>
 
-#include "ddl_queue.h"
-#include "ddl_log.h"
-#include "ddl_evt.h"
-#include "module_template_1.h"
+#include "ddl_util.h"
 
-#define TAG "MAIN"
 
-enum {
-    LOOP_COUNT_SET_1 = 0x0000F,
-    LOOP_COUNT_SET_2 = 0x0001F,
-    LOOP_COUNT_SET_3 = 0x0002F,
-    LOOP_COUNT_SET_4 = 0x0003F,
-    LOOP_COUNT_MAX
-}loop_count_set_t;
+#define SAMPLE_COUNT_MIN  0x0000
+#define SAMPLE_COUNT_MAX  0x07FF
+#define SAMPLE_COUNT_MID  0x0000
 
-int loopCount = 0;
-uint8_t dataBuff [ 10 ] = { 1,2,3,4,5,6,7,8,9,10 };
+#define SCALE_TO_MIN  -100
+#define SCALE_TO_MAX  +100
+#define SCALE_TO_MID  0
 
-int main(void) {
-    ddl_evt_init();
-    ddl_evt_reg_module(module_template_1_task);
+ // #define SAMPLE_VALUE (((0x03FF / 1)*2)+0)
+#define SAMPLE_VALUE 0x08ff
+#define ADJUST_TO_DECIMAL 4
 
-    while ( 1 ) {
-        if ( LOOP_COUNT_MAX <= loopCount ) {
-            loopCount = 0;
-        } else {
-            ddl_evt_t sampleEvent = { 0 };
-            sampleEvent.nextModule = module_template_1_task;
 
-            switch ( loopCount ) {
-                case LOOP_COUNT_SET_1:
-                    sampleEvent.eventType = MODULE_TEMPLATE_1_EVT_TYPE_TEST_1;
-                    sampleEvent.pDataBuff = dataBuff;
-                    sampleEvent.dataBuffLen = (sizeof(dataBuff));
-                    ddl_evt_post(&sampleEvent);
-                    break;
-
-                case LOOP_COUNT_SET_2:
-                    sampleEvent.eventType = MODULE_TEMPLATE_1_EVT_TYPE_TEST_2;
-                    ddl_evt_post(&sampleEvent);
-                    break;
-
-                case LOOP_COUNT_SET_3:
-                    break;
-
-                default:
-                    break;
-            }
-            loopCount++;
-        }
-
-        ddl_evt_consumer();
-    }
-
-    return 0;
+void main(int argc, char *argv []) {
+    float normalized = 0.0, scaled = 0.0;
+    normalized = ddl_util_normalize((float) SAMPLE_COUNT_MIN, (float) SAMPLE_COUNT_MAX, (float) SAMPLE_COUNT_MID, (float) SAMPLE_VALUE, ADJUST_TO_DECIMAL);
+    scaled = ddl_util_scale((float) SCALE_TO_MIN, (float) SCALE_TO_MAX, (float) SCALE_TO_MID, (float) normalized, ADJUST_TO_DECIMAL);
+    // scaled = scaled + (((float) SCALE_TO_MAX - (float) SCALE_TO_MID) / (float) SAMPLE_COUNT_MAX);
+    printf("Normalized value: %4.8f\r\n", normalized);
+    printf("Scaled value(dec): %4.4f\r\n", scaled);
+    printf("Scaled value(hex): 0x%4.4X\r\n", (int) scaled);
 }
+
