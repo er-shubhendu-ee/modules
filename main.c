@@ -14,16 +14,16 @@
 #include "ddl_util.h"
 
 
-#define SAMPLE_COUNT_MIN  0x0000
-#define SAMPLE_COUNT_MAX  0x07FF
-#define SAMPLE_COUNT_MID  0x0000
+#define SAMPLE_COUNT_MIN  0x000f
+#define SAMPLE_COUNT_MAX  0x0FF0
+#define SAMPLE_COUNT_MID  0x0800
 
 #define SCALE_TO_MIN  -100
 #define SCALE_TO_MAX  +100
 #define SCALE_TO_MID  0
 
  // #define SAMPLE_VALUE (((0x03FF / 1)*2)+0)
-#define SAMPLE_VALUE 0x08ff
+#define SAMPLE_VALUE 0x07ff
 #define ADJUST_TO_DECIMAL 4
 
 

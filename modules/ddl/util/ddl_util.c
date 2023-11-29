@@ -608,23 +608,20 @@ void ddl_util_timSort(int *pIntArray, int intArraySize) {
 
 float __attribute__((inline)) ddl_util_normalize(float valueMin, float valueMax, float valueMid, float valueIn, int roundToDecimal) {
     float normalizedValue = 0.0;
-    if ( valueMin == valueMid ) {
-        normalizedValue = ((valueIn - valueMin) / (valueMax - valueMin));
+    float rangeMin = 0.0;
+    float rangeMax = 0.0;
 
+    if ( valueIn < valueMid ) {
+        rangeMin = valueMin;
+        rangeMax = valueMid;
+        normalizedValue = (valueIn - rangeMin) / (rangeMax - rangeMin) - 1;
     } else {
-        float valueActive = 0.0;
-        if ( valueIn > valueMid ) {
-            valueActive = 2 * ((valueIn - valueMid) <= valueMax ? (valueIn - valueMid) : valueMax);
-            normalizedValue = ((valueActive - valueMin) / (valueMax - valueMin));
-
-        } else if ( valueIn < valueMid ) {
-            valueActive = 2 * ((valueMid - valueIn) <= valueMax ? (valueMid - valueIn) : valueMax);
-            normalizedValue = (-1.0 * ((valueActive - valueMin) / (valueMax - valueMin)));
-
-        } else {
-            normalizedValue = 0.0;
-        }
+        rangeMin = valueMid;
+        rangeMax = valueMax;
+        normalizedValue = (valueIn - rangeMin) / (rangeMax - rangeMin);
     }
+
+
 
     return roundf(normalizedValue * (float) pow(10, roundToDecimal)) / (float) pow(10, roundToDecimal);
 }
