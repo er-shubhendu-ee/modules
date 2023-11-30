@@ -23,7 +23,7 @@
 #define SCALE_TO_MID  0
 
  // #define SAMPLE_VALUE (((0x03FF / 1)*2)+0)
-#define SAMPLE_VALUE 0x07ff
+#define SAMPLE_VALUE 0x0800
 #define ADJUST_TO_DECIMAL 4
 
 

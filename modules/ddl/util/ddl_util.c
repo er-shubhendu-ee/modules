@@ -628,27 +628,27 @@ float __attribute__((inline)) ddl_util_normalize(float valueMin, float valueMax,
 
 
 float __attribute__((inline)) ddl_util_scale(float valueMin, float valueMax, float valueMid, float normalizedValueIn, int roundToDecimal) {
-    float spanTotal = valueMax - valueMin;
-    float spanNegative = valueMid - valueMin;
-    float spanPositive = spanTotal - spanNegative;
-    float spanUnitNegative = (spanNegative / spanTotal);
-    float spanUnitPositive = (spanPositive / spanTotal);
+    float rangePositive = (float) 0;
+    float rangeNegative = (float) 0;
+    float normalizedToScale = (float) 0;
+    float scaledValue = (float) 0;
 
-    if ( normalizedValueIn > spanUnitNegative ) {
-        // float  scaledValue = (normalizedValueIn * ((valueMax - valueMin) + valueMin));
-        float normalizedInPositiveSpan = ddl_util_normalize(0, spanUnitPositive, 0, normalizedValueIn - spanUnitNegative, roundToDecimal);
-        float  scaledValue = (normalizedInPositiveSpan * ((valueMax - valueMid) + valueMid));
-        return ((scaledValue <= valueMax) ? scaledValue : valueMax);
 
+    if ( 0 > valueMid ) {
+        rangePositive = valueMax + abs(valueMid);
+        rangeNegative = abs(valueMin) - abs(valueMid);
     } else {
-        float  scaledValue = 0.0;
-        float normalizedInNegativeSpan = 1 - ddl_util_normalize(0, spanUnitNegative, 0, normalizedValueIn, roundToDecimal);
-        if ( valueMid > 0 ) {
-            scaledValue = (normalizedInNegativeSpan * ((valueMin - valueMid) + valueMid));
-        } else {
-            scaledValue = (normalizedInNegativeSpan * ((valueMin + valueMid) + valueMid));
-        }
-        return ((scaledValue >= valueMin) ? scaledValue : valueMin);
+        rangePositive = valueMax - valueMid;
+        rangeNegative = abs(valueMin) + valueMid;
     }
 
+    if ( 0 > normalizedValueIn ) {
+        scaledValue = normalizedValueIn * rangeNegative;
+    } else {
+        scaledValue = valueMid + (normalizedValueIn * rangePositive);
+    }
+
+    scaledValue = ((scaledValue < valueMin) ? valueMin : ((scaledValue > valueMax) ? valueMax : scaledValue));
+
+    return roundf(scaledValue * (float) pow(10, roundToDecimal)) / (float) pow(10, roundToDecimal);
 }
