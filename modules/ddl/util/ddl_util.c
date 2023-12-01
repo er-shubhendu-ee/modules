@@ -12,6 +12,7 @@
 #include <string.h>
 #include <error.h>
 #include <math.h>
+#include <stdlib.h>
 
 /**/
 #include "ddl_base.h"
@@ -611,19 +612,43 @@ float __attribute__((inline)) ddl_util_normalize(float valueMin, float valueMax,
     float rangeMin = 0.0;
     float rangeMax = 0.0;
 
+    if ( valueMin > valueIn ) {
+        return (float) 0;
+    }
+
+    if ( valueMax < valueIn ) {
+        return (float) 1;
+    }
+
+
     if ( valueIn < valueMid ) {
-        rangeMin = valueMin;
-        rangeMax = valueMid;
+        if ( valueMin > valueMid ) {
+            return (float) -1;
+        } else if ( valueMin == valueMid ) {
+            rangeMin = valueMid;
+            rangeMax = valueMax;
+        } else {
+            rangeMin = valueMin;
+            rangeMax = valueMid;
+        }
+
         normalizedValue = (valueIn - rangeMin) / (rangeMax - rangeMin) - 1;
     } else {
+        if ( valueMax < valueMid ) {
+            return (float) -1;
+        }
+
         rangeMin = valueMid;
         rangeMax = valueMax;
+
         normalizedValue = (valueIn - rangeMin) / (rangeMax - rangeMin);
     }
 
 
 
-    return roundf(normalizedValue * (float) pow(10, roundToDecimal)) / (float) pow(10, roundToDecimal);
+    normalizedValue = roundf(normalizedValue * (float) pow(10, roundToDecimal)) / (float) pow(10, roundToDecimal);
+
+    return ((normalizedValue < (float) -1) ? (float) -1 : (normalizedValue > (float)1) ? 1 : (float) normalizedValue);
 }
 
 
