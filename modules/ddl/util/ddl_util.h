@@ -167,6 +167,9 @@ extern "C" {
 
     float __attribute__((inline))  ddl_util_normalize(float valueMin, float valueMax, float valueMid, float valueIn, int roundToDecimal);
     float __attribute__((inline))  ddl_util_scale(float valueMin, float valueMax, float valueMid, float normalizedValueIn, int roundToDecimal);
+    float ddl_util_find_min(float *dataBuff, int dataBuffLen);
+    float ddl_util_find_max(float *dataBuff, int dataBuffLen);
+    int ddl_util_plot_function_2d(char *pTitleString, char *xLabel, char *yLabel, float *pDataBuff_x, float *pDataBuff_y, int dataPointCount);
 
 #ifdef __cplusplus
 }

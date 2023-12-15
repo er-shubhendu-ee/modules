@@ -18,8 +18,8 @@
 
 #define TEST_BOTH_DIRECTION 1
 
-#define DATA_POINTS_COUNT 5
-#define COMMANDS_POINTS_COUNT 20
+#define DATA_POINTS_COUNT 100
+
 
 
  /* for 0A-50A */
@@ -73,7 +73,6 @@
 
 #define ADJUST_TO_DECIMAL 4
 
-static int plot_function(void);
 
 void main(int argc, char *argv []) {
     float normalized = 0.0, scaled = 0.0;
@@ -89,39 +88,7 @@ void main(int argc, char *argv []) {
     printf("Scaled value(dec): %4.4f\r\n", scaled);
     printf("Scaled value(hex): 0x%4.4X\r\n", (int) scaled);
 
-    plot_function();
-}
-
-
-static int plot_function(void) {
-    char *commandsForGnuplot [ COMMANDS_POINTS_COUNT ] = { "set title \"TITLEEEEE\"",
-                                                            "set yrange [0:100]",
-                                                            "set xrange [0:10]",
-                                                            "set grid xtics 1", // # draw lines for each ytics and mytics
-                                                            "set grid ytics 1", // # draw lines for each ytics and mytics
-                                                            "set grid", //              # enable the grid
-                                                            "plot 'data.temp'" ,
-                                                            0
-    };
-    double xvals [ DATA_POINTS_COUNT ] = { 1.0, 2.0, 3.0, 4.0, 5.0 };
-    double yvals [ DATA_POINTS_COUNT ] = { 5.0 ,3.0, 1.0, 3.0, 5.0 };
-    FILE *temp = fopen("data.temp", "w");
-    /*Opens an interface that one can use to send commands as if they were typing into the
-     *     gnuplot command line.  "The -persistent" keeps the plot open even after your
-     *     C program terminates.
-     */
-    FILE *gnuplotPipe = popen("gnuplot -persistent", "w");
-    int indexI = 0;
-    while ( indexI < DATA_POINTS_COUNT ) {
-        fprintf(temp, "%lf %lf \n", xvals [ indexI ], yvals [ indexI ]); //Write the data to a temporary file
-        indexI++;
-    }
-
-    indexI = 0;
-    while ( commandsForGnuplot [ indexI ] ) {
-        fprintf(gnuplotPipe, "%s \n", commandsForGnuplot [ indexI ]); //Send commands to gnuplot one by one.
-        indexI++;
-    }
-
-    return 0;
+    float data_x [ DATA_POINTS_COUNT ] = { -1.0,-2.0,-3.0,-4.0,-5.0,0 ,1.0,2.0,3.0,4.0,5.0,(float) 0 };
+    float data_y [ DATA_POINTS_COUNT ] = { -1.0,-2.0,-3.0,-4.0,-5.0,0 ,1.0,2.0,3.0,4.0,5.0,(float) 0 };
+    ddl_util_plot_function_2d("title", "x label", "y label", data_x, data_y, DATA_POINTS_COUNT);
 }

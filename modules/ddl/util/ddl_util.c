@@ -23,6 +23,8 @@
 
 #include "ddl_util.h"
 
+
+#define COMMANDS_POINTS_COUNT 20
 /**
  * random string generator
  **/
@@ -466,14 +468,14 @@ const char *ddl_util_find_char_pointer(const char *s, size_t len, unsigned char 
     return len ? s : NULL;
 }
 
-ddl_base_status_t ddl_util_get_data_from_string(uint8_t *dataBuff, const char *sourceString, const char *dataKey,
+ddl_base_status_t ddl_util_get_data_from_string(uint8_t *pDataBuff, const char *sourceString, const char *dataKey,
     const char *keyValueSeperator, const char *dataSeperator) {
     int processStatus = DDL_BASE_STATUS_OK;
     int32_t dataKeyStartIndexOffset = 0;
     int32_t dataKeyStartIndex = -1;
     int32_t dataStringLength = -1;
 
-    if ( dataBuff && sourceString && dataKey && keyValueSeperator && dataSeperator ) {
+    if ( pDataBuff && sourceString && dataKey && keyValueSeperator && dataSeperator ) {
     label_checkRemainingStringForTheKey:
 
         dataKeyStartIndex = ddl_util_is_found_string(sourceString + dataKeyStartIndexOffset, dataKey);
@@ -489,7 +491,7 @@ ddl_base_status_t ddl_util_get_data_from_string(uint8_t *dataBuff, const char *s
                     } else {
                         dataStringLength -= (strlen(dataKey) + strlen(keyValueSeperator));
                     }
-                    memcpy(dataBuff, sourceString + dataKeyStartIndex + strlen(dataKey) + strlen(keyValueSeperator),
+                    memcpy(pDataBuff, sourceString + dataKeyStartIndex + strlen(dataKey) + strlen(keyValueSeperator),
                         dataStringLength);
                 } else {
                 }
@@ -676,4 +678,63 @@ float __attribute__((inline)) ddl_util_scale(float valueMin, float valueMax, flo
     scaledValue = ((scaledValue < valueMin) ? valueMin : ((scaledValue > valueMax) ? valueMax : scaledValue));
 
     return roundf(scaledValue * (float) pow(10, roundToDecimal)) / (float) pow(10, roundToDecimal);
+}
+
+float ddl_util_find_min(float *pDataBuff, int dataBuffLen) {
+    if ( !pDataBuff || !dataBuffLen ) {
+        return (float) 0;
+    }
+}
+
+float ddl_util_find_max(float *pDataBuff, int dataBuffLen) {
+    if ( !pDataBuff || !dataBuffLen ) {
+        return (float) 0;
+    }
+}
+
+int ddl_util_plot_function_2d(char *pTitleString, char *xLabel, char *yLabel, float *pDataBuff_x, float *pDataBuff_y, int dataPointCount) {
+    if ( !pDataBuff_x || !pDataBuff_y || !dataPointCount ) {
+        return 1;
+    }
+
+    int indexI = 0;
+    float valueMin = ddl_util_find_min(pDataBuff_x, dataPointCount);
+    float valueMax = ddl_util_find_max(pDataBuff_x, dataPointCount);
+
+    FILE *temp = fopen("data.temp", "w");
+    if ( !temp ) {
+        return 1;
+    }
+
+    /*Opens an interface that one can use to send commands as if they were typing into the
+     *     gnuplot command line.  "The -persistent" keeps the plot open even after your
+     *     C program terminates.
+     */
+    FILE *gnuplotPipe = popen("gnuplot -persistent", "w");
+    if ( !gnuplotPipe ) {
+        return 1;
+    }
+
+    while ( indexI < dataPointCount ) {
+        fprintf(temp, "%lf %lf \n", *((float *) pDataBuff_x + indexI), *((float *) pDataBuff_y + indexI)); //Write the data to a temporary file
+        indexI++;
+    }
+
+    indexI = 0;
+    char *commandsForGnuplot [ COMMANDS_POINTS_COUNT ] = { "set title \"CURRENT VS ADC COUNT\"",
+                                                        "set style line 1 lc rgb 'red' pt 7", // #Circle
+                                                        "set yrange [-10:+10]",
+                                                        "set xrange [-10:10]",
+                                                        "set grid xtics 1", // # draw lines for each ytics and mytics
+                                                        "set grid ytics 1", // # draw lines for each ytics and mytics
+                                                        "set grid", //              # enable the grid
+                                                        "plot 'data.temp' with points ls 1" ,
+                                                        0
+    };
+    while ( commandsForGnuplot [ indexI ] ) {
+        fprintf(gnuplotPipe, "%s \n", commandsForGnuplot [ indexI ]); //Send commands to gnuplot one by one.
+        indexI++;
+    }
+
+    return 0;
 }
