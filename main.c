@@ -30,10 +30,15 @@ float dataSet [][ 2 ] = { {-100,0.27},
 
 static int get_sample_count(float *pDataSet);
 static int print_dataset(float *pDataSet, int sampleCount);
+static int extract_x(float *pDataSet, float *pBuff_x, int sampleCount);
+static int extract_y(float *pDataSet, float *pBuff_y, int sampleCount);
+
 
 void main(int argc, char *argv []) {
+    float buff_x [ 100 ] = { 0 };
     int sampleCount = get_sample_count(dataSet);
     print_dataset(dataSet, sampleCount);
+    extract_x(dataSet, buff_x, sampleCount);
 }
 
 
@@ -63,6 +68,22 @@ static int print_dataset(float *pDataSet, int sampleCount) {
         for ( indexJ = 0; indexJ < 2; indexJ++ ) {
             printf("%3.2f,", *(pDataSet + (indexI * 2) + indexJ));
         }
+        printf("\n");
+        indexI++;
+    }
+}
+
+
+static int extract_x(float *pDataSet, float *pBuff_x, int sampleCount) {
+    if ( !pDataSet ) {
+        return 0;
+    }
+
+    int indexI = 0;
+    int indexJ = 0;
+
+    while ( indexI < sampleCount ) {
+        printf("%3.2f,", *(pDataSet + (indexI * 2)));
         printf("\n");
         indexI++;
     }
