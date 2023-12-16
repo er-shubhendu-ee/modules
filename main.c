@@ -28,38 +28,42 @@ float dataSet [][ 2 ] = { {-100,0.27},
                         {96,4.6},
                         {100,4.65} };
 
+static int get_sample_count(float *pDataSet);
+static int print_dataset(float *pDataSet, int sampleCount);
+
 void main(int argc, char *argv []) {
-    for ( size_t i = 0; i < 11; i++ ) {
-        for ( size_t j = 0; j < 2; j++ ) {
-            printf("%3.2f,", dataSet [ i ][ j ]);
+    int sampleCount = get_sample_count(dataSet);
+    print_dataset(dataSet, sampleCount);
+}
+
+
+static int get_sample_count(float *pDataSet) {
+    if ( !pDataSet ) {
+        return 0;
+    }
+
+    int64_t startAddress = (int64_t) dataSet;
+    int64_t endAddress = (int64_t) * (&dataSet + 1);
+    int64_t sampleCount = (endAddress - startAddress) / (sizeof(float) * 2);
+
+    return sampleCount;
+}
+
+
+
+static int print_dataset(float *pDataSet, int sampleCount) {
+    if ( !pDataSet ) {
+        return 0;
+    }
+
+    int indexI = 0;
+    int indexJ = 0;
+
+    while ( indexI < sampleCount ) {
+        for ( indexJ = 0; indexJ < 2; indexJ++ ) {
+            printf("%3.2f,", *(pDataSet + (indexI * 2) + indexJ));
         }
         printf("\n");
+        indexI++;
     }
-
-    float a = (float) 0;
-    float b = (float) 0;
-    float c = (float) 0;
-    float d = (float) 0;
-    float sumX = (float) 0;
-    float sumX2 = (float) 0;
-    float sumX3 = (float) 0;
-    float sumY = (float) 0;
-    float sumXY = (float) 0;
-    int indexI = 0;
-
-    /* Calculating Required Sum */
-    for ( indexI = 1; indexI <= SAMPLE_COUNT; indexI++ ) {
-        sumX = sumX + dataSet [ indexI ][ 0 ];
-        sumX2 = sumX2 + powf(dataSet [ indexI ][ 0 ], 2);
-        sumX3 = sumX3 + powf(dataSet [ indexI ][ 0 ], 3);
-        sumY = sumY + dataSet [ indexI ][ 1 ];
-        sumXY = sumXY + dataSet [ indexI ][ 0 ] * dataSet [ indexI ][ 1 ];
-    }
-    /* Calculating a and b */
-    c = (SAMPLE_COUNT * sumXY - sumX * sumY) / (SAMPLE_COUNT * sumX3 - pow(sumX, 3));
-    b = (SAMPLE_COUNT * sumXY - sumX * sumY) / (SAMPLE_COUNT * sumX2 - pow(sumX, 2));
-    a = (sumY - b * sumX) / SAMPLE_COUNT;
-    /* Displaying value of a and b */
-    printf("Values are: a=%0.4f, b = %0.4f and c = %0.4f", a, b, c);
-    printf("\nEquation of best fit is: y = %0.4f + %0.4fx + %0.4fx^2", a, b, c);
 }
