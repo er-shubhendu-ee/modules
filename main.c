@@ -35,13 +35,13 @@ static int extract_y(float *pDataSet, float *pBuff_y, int sampleCount);
 
 
 void main(int argc, char *argv []) {
-    float buff_x [ SAMPLE_COUNT ] = { -1.0,-2.0,-3.0,-4.0,-5.0,(float) 0 ,1.0,2.0,3.0,4.0,5.0,(float) 0 };
-    float buff_y [ SAMPLE_COUNT ] = { -1.0,-2.0,-3.0,-4.0,-5.0,(float) 0 ,1.0,2.0,3.0,4.0,5.0,(float) 0 };
-    int sampleCount = get_sample_count(dataSet);
+    float buff_x [ SAMPLE_COUNT ] = { (float) 0 };
+    float buff_y [ SAMPLE_COUNT ] = { (float) 0 };
+    int sampleCount = get_sample_count((float *) dataSet);
 
-    print_dataset(dataSet, sampleCount);
-    extract_x(dataSet, buff_x, sampleCount);
-    extract_y(dataSet, buff_y, sampleCount);
+    print_dataset((float *) dataSet, sampleCount);
+    extract_x((float *) dataSet, buff_x, sampleCount);
+    extract_y((float *) dataSet, buff_y, sampleCount);
     ddl_util_plot_function_2d("title", "x label", "y label", buff_x, buff_y, SAMPLE_COUNT);
 }
 

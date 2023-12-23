@@ -742,7 +742,7 @@ int ddl_util_plot_function_2d(char *pTitleString, char *xLabel, char *yLabel, fl
 
                                                         "set style line 7 lt 1 lc rgb '#0000A0' lw 2 pt 2 ps 1.5",
 
-                                                        "set grid", //              # enable the grid
+                                                        "set grid back ls 2", //              # enable the grid
 
                                                         "set title \"CURRENT VS ADC COUNT\"",
                                                         "set yrange [0:6]",
