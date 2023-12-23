@@ -723,14 +723,15 @@ int ddl_util_plot_function_2d(char *pTitleString, char *xLabel, char *yLabel, fl
     indexI = 0;
     char *commandsForGnuplot [ COMMANDS_POINTS_COUNT ] = { "set title \"CURRENT VS ADC COUNT\"",
                                                         "set style line 1 lc rgb 'red' pt 7", // #Circle
-                                                        "set yrange [-10:+10]",
-                                                        "set xrange [-10:10]",
-                                                        "set grid xtics 1", // # draw lines for each ytics and mytics
-                                                        "set grid ytics 1", // # draw lines for each ytics and mytics
+                                                        "set yrange [-5:+5]",
+                                                        "set xrange [-100:100]",
+                                                        "set grid xtics 0.1", // # draw lines for each ytics and mytics
+                                                        "set grid ytics 0.1", // # draw lines for each ytics and mytics
                                                         "set grid", //              # enable the grid
                                                         "plot 'data.temp' with points ls 1" ,
                                                         0
     };
+
     while ( commandsForGnuplot [ indexI ] ) {
         fprintf(gnuplotPipe, "%s \n", commandsForGnuplot [ indexI ]); //Send commands to gnuplot one by one.
         indexI++;
