@@ -745,8 +745,8 @@ int ddl_util_plot_function_2d(char *pTitleString, char *xLabel, char *yLabel, fl
                                                         "set grid back ls 2", //              # enable the grid
 
                                                         "set title \"CURRENT VS ADC COUNT\"",
-                                                        "set yrange [0:6]",
-                                                        "set xrange [-100:100]",
+                                                        "set yrange [-110:+110]",
+                                                        "set xrange [0:6]",
                                                         "plot 'data.temp' with points ls 7" ,
                                                         0
     };
