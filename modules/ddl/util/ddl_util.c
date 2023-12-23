@@ -684,12 +684,36 @@ float ddl_util_find_min(float *pDataBuff, int dataBuffLen) {
     if ( !pDataBuff || !dataBuffLen ) {
         return (float) 0;
     }
+
+    int indexI = 0;
+    float minValue = (float) 0;
+
+    minValue = *((float *) pDataBuff);
+    while ( indexI < dataBuffLen ) {
+        minValue = (minValue > *((float *) pDataBuff + indexI)) ? \
+            (minValue = *((float *) pDataBuff + indexI)) : (minValue = minValue);
+        indexI++;
+    }
+
+    return minValue;
 }
 
 float ddl_util_find_max(float *pDataBuff, int dataBuffLen) {
     if ( !pDataBuff || !dataBuffLen ) {
         return (float) 0;
     }
+
+    int indexI = 0;
+    float maxValue = (float) 0;
+
+    maxValue = *((float *) pDataBuff);
+    while ( indexI < dataBuffLen ) {
+        maxValue = (maxValue < *((float *) pDataBuff + indexI)) ? \
+            (maxValue = *((float *) pDataBuff + indexI)) : (maxValue = maxValue);
+        indexI++;
+    }
+
+    return maxValue;
 }
 
 int ddl_util_plot_function_2d(char *pTitleString, char *xLabel, char *yLabel, float *pDataBuff_x, float *pDataBuff_y, int dataPointCount) {
