@@ -721,14 +721,33 @@ int ddl_util_plot_function_2d(char *pTitleString, char *xLabel, char *yLabel, fl
     }
 
     indexI = 0;
-    char *commandsForGnuplot [ COMMANDS_POINTS_COUNT ] = { "set title \"CURRENT VS ADC COUNT\"",
-                                                        "set style line 1 lc rgb 'red' pt 7", // #Circle
-                                                        "set yrange [-5:+5]",
-                                                        "set xrange [-100:100]",
-                                                        "set grid xtics 0.1", // # draw lines for each ytics and mytics
-                                                        "set grid ytics 0.1", // # draw lines for each ytics and mytics
+    char *commandsForGnuplot [ COMMANDS_POINTS_COUNT ] = {
+                                                        "set xtics nomirror", //  nomirror means do not put tics on the opposite side of the plot
+                                                        "set ytics nomirror",
+
+                                                        "set xtics 1", //  On the X axis put a major tick every 1
+                                                        "set ytics 1", //  On the Y axis put a major tick every 1
+
+                                                        "set mxtics 2", //  On both the x and y axes split each space in 2 and put a minor tic there
+                                                        "set mytics 2",
+
+                                                        "set style line 1 lt 0 lc rgb '#808080'", // line style for border
+                                                        "set border 3 back ls 1 ",
+
+                                                        "set style line 2 lt 0 lc rgb '#808080' lw 0.5",
+                                                        "set grid xtics",
+                                                        "set grid ytics",
+                                                        "set grid mxtics",
+                                                        "set grid mytics",
+
+                                                        "set style line 7 lt 1 lc rgb '#0000A0' lw 2 pt 2 ps 1.5",
+
                                                         "set grid", //              # enable the grid
-                                                        "plot 'data.temp' with points ls 1" ,
+
+                                                        "set title \"CURRENT VS ADC COUNT\"",
+                                                        "set yrange [0:6]",
+                                                        "set xrange [-100:100]",
+                                                        "plot 'data.temp' with points ls 7" ,
                                                         0
     };
 

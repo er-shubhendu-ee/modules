@@ -88,8 +88,8 @@ static int extract_x(float *pDataSet, float *pBuff_x, int sampleCount) {
 
     while ( indexI < sampleCount ) {
         *((float *) pBuff_x + indexI) = *((float *) pDataSet + (indexI * 2));
-        printf("%3.2f,", *((float *) pBuff_x + indexI));
-        printf("\n");
+        // printf("%3.2f,", *((float *) pBuff_x + indexI));
+        // printf("\n");
         indexI++;
     }
 }
@@ -104,8 +104,8 @@ static int extract_y(float *pDataSet, float *pBuff_y, int sampleCount) {
 
     while ( indexI < sampleCount ) {
         *((float *) pBuff_y + indexI) = *((float *) pDataSet + (indexI * 2) + 1);
-        printf("%3.2f,", *((float *) pBuff_y + indexI));
-        printf("\n");
+        // printf("%3.2f,", *((float *) pBuff_y + indexI));
+        // printf("\n");
         indexI++;
     }
 }
