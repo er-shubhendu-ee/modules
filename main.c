@@ -38,12 +38,23 @@ static float predict_y_value(float *pDataset, int sampleCount, float inputValue)
 #define SAMPLE_INPUT_VALUE 4.6
 
 void main(int argc, char *argv []) {
-    float predictedValue = (float) 0;
-    predict_y_value((float *) dataSet, SAMPLE_COUNT, (float) SAMPLE_INPUT_VALUE);
+    int indexI = 0;
+    float inputValue = (float) 0;
+    float buff_x [ BUFFER_SIZE ] = { (float) 0 };
+    float buff_y [ BUFFER_SIZE ] = { (float) 0 };
 
-    // extract_x((float *) pDataset, buff_x, sampleCount);
-    // extract_y((float *) pDataset, buff_y, sampleCount);
-    // ddl_util_plot_function_2d("title", "x label", "y label", buff_x, buff_y, SAMPLE_COUNT);
+    indexI = 0;
+    while ( (float) inputValue < (float) 5 ) {
+        buff_x [ indexI ] = inputValue;
+        buff_y [ indexI ] = predict_y_value((float *) dataSet, SAMPLE_COUNT, (float) buff_x [ indexI ]);
+
+        printf("\n%3.2f,%3.2f", buff_x [ indexI ], buff_y [ indexI ]);
+
+        indexI++;
+        inputValue += 0.05;
+    }
+
+    ddl_util_plot_function_2d("title", "x label", "y label", buff_x, buff_y, indexI);
 }
 
 static float predict_y_value(float *pDataset, int sampleCount, float inputValue) {
@@ -52,12 +63,15 @@ static float predict_y_value(float *pDataset, int sampleCount, float inputValue)
     float PVSpan = (float) 0;
     float InputSpan = (float) 0;
     float scaledValue = (float) 0;
-    float buff_x [ BUFFER_SIZE ] = { (float) 0 };
-    float buff_y [ BUFFER_SIZE ] = { (float) 0 };
+    float buff_x [ SAMPLE_COUNT ] = { (float) 0 };
+    float buff_y [ SAMPLE_COUNT ] = { (float) 0 };
     float valueMin = (float) 0;
     float valueMax = (float) 0;
 
+#if (LOG_LEVEL>0)
     print_dataset((float *) pDataset, sampleCount);
+#endif
+
     extract_x((float *) pDataset, buff_x, sampleCount);
     extract_y((float *) pDataset, buff_y, sampleCount);
 
@@ -100,8 +114,10 @@ static float predict_y_value(float *pDataset, int sampleCount, float inputValue)
     scaledValue = *((float *) buff_y + (i - 1));
 
 label_exitPoint:
+#if (LOG_LEVEL>0)
     printf("\tInput value\t|\tCalculated value\n");
     printf("\t%3.2f\t\t\t\t%3.2f", inputValue, scaledValue);
+#endif
     return scaledValue;
 }
 

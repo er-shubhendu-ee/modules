@@ -764,7 +764,7 @@ int ddl_util_plot_function_2d(char *pTitleString, char *xLabel, char *yLabel, fl
                                                         "set grid mxtics",
                                                         "set grid mytics",
 
-                                                        "set style line 7 lt 1 lc rgb '#0000A0' lw 2 pt 2 ps 1.5",
+                                                        "set style line 7 lt 1 lc rgb '#0000A0' lw 2 pt 7 ps 1",
 
                                                         "set grid back ls 2", //              # enable the grid
 
