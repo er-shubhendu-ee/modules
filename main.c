@@ -10,56 +10,79 @@
  **/
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 
 #include "ddl_util.h"
 
-#define SAMPLE_COUNT 11
 
-float dataSet [][ 2 ] = { {-100,0.27},
-                        {-96,0.34},
-                        {-36,1.68},
-                        {-20,2.08},
-                        {-4,2.41},
-                        {0,2.49},
-                        {4,2.57},
-                        {20,2.89},
-                        {36,3.29},
-                        {96,4.6},
-                        {100,4.65} };
+ // #define TEST_SINGLE_DIRECTION 1
+
+#define TEST_BOTH_DIRECTION 1
+
+
+ /* for 0A-50A */
+#if defined(TEST_SINGLE_DIRECTION)
+#define APP_CONFIG_ADC_COUNT_MIN 0x0062 // min
+#define APP_CONFIG_ADC_COUNT_MID APP_CONFIG_ADC_COUNT_MIN // 0x0768 // mid
+#define APP_CONFIG_ADC_COUNT_MAX 0x0E6F // max
+// #define SAMPLE_VALUE 0x08DA // 7.5A
+
+#define APP_ADC_SCALE_TO_MIN 0  
+#define APP_ADC_SCALE_TO_MAX 50 
+#define APP_ADC_SCALE_TO_MID APP_ADC_SCALE_TO_MIN
+
+
+// #define SAMPLE_VALUE (APP_ADC_COUNT_OFFSET+APP_CONFIG_ADC_COUNT_MIN)
+// #define SAMPLE_VALUE (APP_ADC_COUNT_OFFSET+APP_CONFIG_ADC_COUNT_MAX)
+// #define APP_CONFIG_ADC_COUNT_DIVISION_UNIT 4
+// #define SAMPLE_VALUE (APP_ADC_COUNT_OFFSET+APP_CONFIG_ADC_COUNT_MIN+((APP_CONFIG_ADC_COUNT_MAX-APP_CONFIG_ADC_COUNT_MIN)/APP_CONFIG_ADC_COUNT_DIVISION_UNIT)) // (((0x03FF / 1)*2)+0)
+#define SAMPLE_VALUE 0x00DA // 7.5A
+#endif
+
+ /* for +-70A */
+#if defined (TEST_BOTH_DIRECTION)
+#define APP_CONFIG_ADC_COUNT_MIN 0x00DD // min
+// #define APP_CONFIG_ADC_COUNT_MID 0x07DF // mid calculated
+#define APP_CONFIG_ADC_COUNT_MID 0x07F8 // mid observed
+#define APP_CONFIG_ADC_COUNT_MAX 0x0EE1 // max
+
+#define APP_ADC_COUNT_OFFSET 0x0000 //0x000A
+#define APP_ADC_COUNT_MIN  (APP_ADC_COUNT_OFFSET + APP_CONFIG_ADC_COUNT_MIN)
+#define APP_ADC_COUNT_MID  (APP_ADC_COUNT_OFFSET + APP_CONFIG_ADC_COUNT_MID)
+#define APP_ADC_COUNT_MAX  (APP_ADC_COUNT_OFFSET + APP_CONFIG_ADC_COUNT_MAX)
+
+#define APP_ADC_SCALE_TO_MIN -50  //  -50
+#define APP_ADC_SCALE_TO_MAX 50 // +50
+#define APP_ADC_SCALE_TO_MID 0
+
+// #define SAMPLE_VALUE (APP_ADC_COUNT_OFFSET+APP_CONFIG_ADC_COUNT_MIN)
+// #define SAMPLE_VALUE (APP_ADC_COUNT_OFFSET+APP_CONFIG_ADC_COUNT_MID)
+// #define SAMPLE_VALUE (APP_ADC_COUNT_OFFSET+APP_CONFIG_ADC_COUNT_MAX)
+#define APP_CONFIG_ADC_COUNT_ADVANCED_UNIT 1
+// #define SAMPLE_VALUE (APP_CONFIG_ADC_COUNT_MID+((APP_CONFIG_ADC_COUNT_MAX-APP_CONFIG_ADC_COUNT_MID)/APP_CONFIG_ADC_COUNT_ADVANCED_UNIT))
+// #define SAMPLE_VALUE (APP_CONFIG_ADC_COUNT_MID-((APP_CONFIG_ADC_COUNT_MID-APP_CONFIG_ADC_COUNT_MIN)/APP_CONFIG_ADC_COUNT_ADVANCED_UNIT))
+#define SAMPLE_VALUE 0x0484
+#endif
+
+#define APP_ADC_COUNT_OFFSET 0x0000 //0x000A
+#define APP_ADC_COUNT_MIN  (APP_ADC_COUNT_OFFSET + APP_CONFIG_ADC_COUNT_MIN)
+#define APP_ADC_COUNT_MID  (APP_ADC_COUNT_OFFSET + APP_CONFIG_ADC_COUNT_MID)
+#define APP_ADC_COUNT_MAX  (APP_ADC_COUNT_OFFSET + APP_CONFIG_ADC_COUNT_MAX)
+
+#define ADJUST_TO_DECIMAL 4
+
 
 void main(int argc, char *argv []) {
-    for ( size_t i = 0; i < 11; i++ ) {
-        for ( size_t j = 0; j < 2; j++ ) {
-            printf("%3.2f,", dataSet [ i ][ j ]);
-        }
-        printf("\n");
-    }
+    float normalized = 0.0, scaled = 0.0;
+    normalized = ddl_util_normalize((float) APP_ADC_COUNT_MIN, (float) APP_ADC_COUNT_MAX, (float) APP_ADC_COUNT_MID, (float) SAMPLE_VALUE, ADJUST_TO_DECIMAL);
+    scaled = ddl_util_scale((float) APP_ADC_SCALE_TO_MIN, (float) APP_ADC_SCALE_TO_MAX, (float) APP_ADC_SCALE_TO_MID, (float) normalized, ADJUST_TO_DECIMAL);
 
-    float a = (float) 0;
-    float b = (float) 0;
-    float c = (float) 0;
-    float d = (float) 0;
-    float sumX = (float) 0;
-    float sumX2 = (float) 0;
-    float sumX3 = (float) 0;
-    float sumY = (float) 0;
-    float sumXY = (float) 0;
-    int indexI = 0;
+    printf("Min: 0x%4.4X\r\n", APP_ADC_COUNT_MIN);
+    printf("Mid: 0x%4.4X\r\n", APP_ADC_COUNT_MID);
+    printf("Max: 0x%4.4X\r\n", APP_ADC_COUNT_MAX);
+    printf("Input: 0x%4.4X\r\n", SAMPLE_VALUE);
 
-    /* Calculating Required Sum */
-    for ( indexI = 1; indexI <= SAMPLE_COUNT; indexI++ ) {
-        sumX = sumX + dataSet [ indexI ][ 0 ];
-        sumX2 = sumX2 + powf(dataSet [ indexI ][ 0 ], 2);
-        sumX3 = sumX3 + powf(dataSet [ indexI ][ 0 ], 3);
-        sumY = sumY + dataSet [ indexI ][ 1 ];
-        sumXY = sumXY + dataSet [ indexI ][ 0 ] * dataSet [ indexI ][ 1 ];
-    }
-    /* Calculating a and b */
-    c = (SAMPLE_COUNT * sumXY - sumX * sumY) / (SAMPLE_COUNT * sumX3 - pow(sumX, 3));
-    b = (SAMPLE_COUNT * sumXY - sumX * sumY) / (SAMPLE_COUNT * sumX2 - pow(sumX, 2));
-    a = (sumY - b * sumX) / SAMPLE_COUNT;
-    /* Displaying value of a and b */
-    printf("Values are: a=%0.4f, b = %0.4f and c = %0.4f", a, b, c);
-    printf("\nEquation of best fit is: y = %0.4f + %0.4fx + %0.4fx^2", a, b, c);
+    printf("Normalized value: %4.8f\r\n", normalized);
+    printf("Scaled value(dec): %4.4f\r\n", scaled);
+    printf("Scaled value(hex): 0x%4.4X\r\n", (int) scaled);
 }
+
