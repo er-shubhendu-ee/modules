@@ -23,7 +23,8 @@
         "memory": "c",
         "new": "c",
         "functional": "c",
-        "ddl_util.h": "c"
+        "ddl_util.h": "c",
+        "data_process.h": "c"
     },
     "C_Cpp.default.customConfigurationVariables": {},
     "C_Cpp.default.includePath": [

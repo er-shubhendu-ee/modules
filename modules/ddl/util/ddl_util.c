@@ -721,6 +721,7 @@ int ddl_util_plot_function_2d(char *pTitleString, char *xLabel, char *yLabel, fl
         return 1;
     }
 
+#if (defined (__WIN32__)||defined(__WIN64__))
     int indexI = 0;
     float valueMin = ddl_util_find_min(pDataBuff_x, dataPointCount);
     float valueMax = ddl_util_find_max(pDataBuff_x, dataPointCount);
@@ -781,4 +782,8 @@ int ddl_util_plot_function_2d(char *pTitleString, char *xLabel, char *yLabel, fl
     }
 
     return 0;
+
+#else
+    return 1;
+#endif
 }
