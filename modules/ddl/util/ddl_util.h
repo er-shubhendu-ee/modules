@@ -110,12 +110,22 @@ bit position is counted from right and assumed that zero-th bit is at far right 
     int types
     **/
 typedef enum TagIntType {
-    UINT8, INT8, UINT16, INT16, UINT32, INT32, UINT64, INT64
-} IntType_t;
+    DDL_UTIL_INT_TYPE_UINT8,
+    DDL_UTIL_INT_TYPE_INT8,
+    DDL_UTIL_INT_TYPE_UINT16,
+    DDL_UTIL_INT_TYPE_INT16,
+    DDL_UTIL_INT_TYPE_UINT32,
+    DDL_UTIL_INT_TYPE_INT32,
+    DDL_UTIL_INT_TYPE_UINT64,
+    DDL_UTIL_INT_TYPE_INT64
+} ddl_util_IntType_t;
 
 typedef enum TagDisplayFormat {
-    INT, OCT, HEX, BIN
-} DisplayFormat_t;
+    DDL_UTIL_DISPLAY_FORMAT_INT,
+    DDL_UTIL_DISPLAY_FORMAT_OCT,
+    DDL_UTIL_DISPLAY_FORMAT_HEX,
+    DDL_UTIL_DISPLAY_FORMAT_BIN
+} ddl_util_DisplayFormat_t;
 
 
 #ifdef __cplusplus
@@ -123,13 +133,13 @@ extern "C" {
 #endif
 
 
-    char *rand_string(char *, size_t);
-    uint8_t ftofs(uint8_t *, float, uint8_t, uint8_t);
-    void ftoa(unsigned char *, float);
-    void int_to_char(int32_t, uchar_t *, uint8_t);
-    void int_to_char_array(char *, void *, int, int, IntType_t, DisplayFormat_t);
-    void edge_detect(ddl_base_edgeProcessBuffer_t *pThisSignal);
-    int pwr(int a, int b);
+    char *ddl_util_rand_string(char *, size_t);
+    uint8_t ddl_util_ftofs(uint8_t *, float, uint8_t, uint8_t);
+    void ddl_util_ftoa(unsigned char *, float);
+    void ddl_util_int_to_char(int32_t, uchar_t *, uint8_t);
+    void ddl_util_int_to_char_array(char *, void *, int, int, ddl_util_IntType_t, ddl_util_DisplayFormat_t);
+    void ddl_util_edge_detect(ddl_base_edgeProcessBuffer_t *pThisSignal);
+    int ddl_util_pwr(int a, int b);
 
 
     int ddl_util_string_to_hex(char *pString, uint8_t singnificantDigits, uint8_t *pParsedHexDataBuff,
