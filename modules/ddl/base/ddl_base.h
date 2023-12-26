@@ -14,7 +14,6 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include <complex.h>
 #include <inttypes.h>
 #include <iso646.h>
 #include <math.h>
@@ -22,9 +21,13 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+
+#if (defined (__GCC__))
+#include <complex.h>
 #include <tgmath.h>
 #include <wchar.h>
 #include <wctype.h>
+#endif
 
 #ifndef BOOL
 #define BOOL bool
@@ -119,35 +122,59 @@ typedef unsigned char uint8_t;
 /* 	#define Min_Data 0x0
     #define Max_Data 0xF */
 
+    // #define bitclear(byte,nbit) ((byte) &= ~(1<<(nbit)))
+    // #define bitflip(byte,nbit)  ((byte) ^=  (1<<(nbit)))
+    // #define bitcheck(byte,nbit) ((byte) &   (1<<(nbit)))
+
+typedef enum ddl_base_tagDataType {
+    DDL_BASE_DATA_TYPE_BOOL,
+    DDL_BASE_DATA_TYPE_CHAR,
+    DDL_BASE_DATA_TYPE_STRING,
+    DDL_BASE_DATA_TYPE_INT8,
+    DDL_BASE_DATA_TYPE_INT16,
+    DDL_BASE_DATA_TYPE_INT32,
+    DDL_BASE_DATA_TYPE_UINT8,
+    DDL_BASE_DATA_TYPE_UINT16,
+    DDL_BASE_DATA_TYPE_UINT32,
+    DDL_BASE_DATA_TYPE_FLOAT
+} ddl_base_dataType_t;
+
+typedef enum ddl_base_tagHardwareId {
+    DDL_BASE_HARDWARE_ID_0 = 0,
+    DDL_BASE_HARDWARE_ID_1,
+    DDL_BASE_HARDWARE_ID_2,
+    DDL_BASE_HARDWARE_ID_MAX
+} ddl_base_hardwareId_t;
+
 typedef enum {
-    CHAR8_T,
-    UCHAR8_T,
-    INTEGER,
-    INT8_T,
-    UINT8_T,
-    INT16_T,
-    UINT16_T,
-    INT32_T,
-    UINT32_T,
-    INT64_T,
-    UINT64_T,
-    FLOAT,
-    FLOAT64_T,
-    LONG,
-    LONG_LONG,
-    DOUBLE,
-    STRING
+    DDL_BASE_TYPE_CHAR8_T,
+    DDL_BASE_TYPE_UCHAR8_T,
+    DDL_BASE_TYPE_INTEGER,
+    DDL_BASE_TYPE_INT8_T,
+    DDL_BASE_TYPE_UINT8_T,
+    DDL_BASE_TYPE_INT16_T,
+    DDL_BASE_TYPE_UINT16_T,
+    DDL_BASE_TYPE_INT32_T,
+    DDL_BASE_TYPE_UINT32_T,
+    DDL_BASE_TYPE_INT64_T,
+    DDL_BASE_TYPE_UINT64_T,
+    DDL_BASE_TYPE_FLOAT,
+    DDL_BASE_TYPE_FLOAT64_T,
+    DDL_BASE_TYPE_LONG,
+    DDL_BASE_TYPE_LONG_LONG,
+    DDL_BASE_TYPE_DOUBLE,
+    DDL_BASE_TYPE_STRING
 } ddl_base_type_t;
 
 typedef enum {
-    BIT0,
-    BIT1,
-    BIT2,
-    BIT3,
-    BIT4,
-    BIT5,
-    BIT6,
-    BIT7
+    DDL_BASE_BYTE_BIT0,
+    DDL_BASE_BYTE_BIT1,
+    DDL_BASE_BYTE_BIT2,
+    DDL_BASE_BYTE_BIT3,
+    DDL_BASE_BYTE_BIT4,
+    DDL_BASE_BYTE_BIT5,
+    DDL_BASE_BYTE_BIT6,
+    DDL_BASE_BYTE_BIT7
 } ddl_base_bit_t;
 
 #ifndef bool
@@ -365,14 +392,14 @@ typedef union {
 #endif
 
 typedef enum {
-    DDMMYY,
-    DDMMYYYY,
-    DDMMMYY,
-    DDMMMYYYY,
-    MMDDYY,
-    MMDDYYYY,
-    MMMDDYY,
-    MMMDDYYYY,
+    DDL_BASE_DATE_FORMAT_DDMMYY,
+    DDL_BASE_DATE_FORMAT_DDMMYYYY,
+    DDL_BASE_DATE_FORMAT_DDMMMYY,
+    DDL_BASE_DATE_FORMAT_DDMMMYYYY,
+    DDL_BASE_DATE_FORMAT_MMDDYY,
+    DDL_BASE_DATE_FORMAT_MMDDYYYY,
+    DDL_BASE_DATE_FORMAT_MMMDDYY,
+    DDL_BASE_DATE_FORMAT_MMMDDYYYY,
 } ddl_base_date_format_t;
 
 typedef struct {

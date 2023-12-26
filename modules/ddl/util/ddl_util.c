@@ -28,7 +28,7 @@
 /**
  * random string generator
  **/
-char *rand_string(char *str, size_t size) {
+char *ddl_util_rand_string(char *str, size_t size) {
     const char charset [] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     size_t n;
     if ( size ) {
@@ -48,7 +48,7 @@ char *rand_string(char *str, size_t size) {
 /*	Following function is to detect edges in a signal also detects if no edge is there(level)     */
 
 /************************************************************************/
-void edge_detect(ddl_base_edgeProcessBuffer_t *pThisSignal) {
+void ddl_util_edge_detect(ddl_base_edgeProcessBuffer_t *pThisSignal) {
     if ( pThisSignal->currentState == TRUE ) {
         if ( pThisSignal->lastState == FALSE ) {
             pThisSignal->positiveEdge = TRUE;
@@ -80,7 +80,7 @@ void edge_detect(ddl_base_edgeProcessBuffer_t *pThisSignal) {
     pThisSignal->lastState = pThisSignal->currentState;
 }
 
-uint8_t ftofs(uint8_t *buf, float f, uint8_t integerCount, uint8_t fractionCount) {
+uint8_t ddl_util_ftofs(uint8_t *buf, float f, uint8_t integerCount, uint8_t fractionCount) {
     const long multiplier [ 9 ] = { 1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000 };
     long temp;
     uint8_t isNegative = 0;
@@ -138,7 +138,7 @@ uint8_t ftofs(uint8_t *buf, float f, uint8_t integerCount, uint8_t fractionCount
  formats like IEE formats for representing floats into an array.          */
 
  /************************************************************************/
-void ftoa(unsigned char *buf, float f) {
+void ddl_util_ftoa(unsigned char *buf, float f) {
     unsigned int rem = 0;
     unsigned char *s = 0, length = 0;
     int i = 0;
@@ -191,32 +191,32 @@ void ftoa(unsigned char *buf, float f) {
  formats formats for representing integers into an array.          */
 
  /************************************************************************/
-void int_to_char_array(char *outputArray, void *inputArray, int outputArraySize, int inputArraySize, IntType_t intType,
-    DisplayFormat_t displayFormat) {
+void ddl_util_int_to_char_array(char *outputArray, void *inputArray, int outputArraySize, int inputArraySize, ddl_util_IntType_t intType,
+    ddl_util_DisplayFormat_t displayFormat) {
     uint8_t intLength = 0;
     uint32_t intConvertedToChar = 0;
     char buffer [ 4 ] = { 0 };
     switch ( displayFormat ) {
-        case (INT): {
+        case (DDL_UTIL_DISPLAY_FORMAT_INT): {
                 switch ( intType ) {
-                    case (UINT8): {
+                    case (DDL_UTIL_INT_TYPE_UINT8): {
                             uint8_t *activeArray = (uint8_t *) inputArray;
                             intLength = 1;
                             break;
                         }
-                    case (INT8): {
+                    case (DDL_UTIL_INT_TYPE_INT8): {
                             break;
                         }
-                    case (UINT16): {
+                    case (DDL_UTIL_INT_TYPE_UINT16): {
                             break;
                         }
-                    case (INT16): {
+                    case (DDL_UTIL_INT_TYPE_INT16): {
                             break;
                         }
-                    case (UINT32): {
+                    case (DDL_UTIL_INT_TYPE_UINT32): {
                             break;
                         }
-                    case (INT32): {
+                    case (DDL_UTIL_INT_TYPE_INT32): {
                             break;
                         }
                     default:
@@ -224,11 +224,11 @@ void int_to_char_array(char *outputArray, void *inputArray, int outputArraySize,
                 }
                 break;
             } break;
-        case (OCT):
+        case (DDL_UTIL_DISPLAY_FORMAT_OCT):
             break;
-        case (HEX):
+        case (DDL_UTIL_DISPLAY_FORMAT_HEX):
             switch ( intType ) {
-                case (UINT8): {
+                case (DDL_UTIL_INT_TYPE_UINT8): {
                         uint8_t *activeArray = (uint8_t *) inputArray;
                         intLength = 1;
                         for ( intConvertedToChar = 0; intConvertedToChar < inputArraySize; intConvertedToChar++ ) {
@@ -236,33 +236,33 @@ void int_to_char_array(char *outputArray, void *inputArray, int outputArraySize,
                         }
                         break;
                     }
-                case (INT8): {
+                case (DDL_UTIL_INT_TYPE_INT8): {
                         break;
                     }
-                case (UINT16): {
+                case (DDL_UTIL_INT_TYPE_UINT16): {
                         break;
                     }
-                case (INT16): {
+                case (DDL_UTIL_INT_TYPE_INT16): {
                         break;
                     }
-                case (UINT32): {
+                case (DDL_UTIL_INT_TYPE_UINT32): {
                         break;
                     }
-                case (INT32): {
+                case (DDL_UTIL_INT_TYPE_INT32): {
                         break;
                     }
                 default:
                     break;
             }
             break;
-        case (BIN):
+        case (DDL_UTIL_DISPLAY_FORMAT_BIN):
             break;
         default:
             break;
     }
 }
 
-void int_to_char(int32_t dataSupplied, /* Data sourced to function */
+void ddl_util_int_to_char(int32_t dataSupplied, /* Data sourced to function */
     uchar_t *buffer,      /* Array to store output */
     uint8_t bufferSize)   /* Storage array size */
 {
@@ -273,7 +273,7 @@ void int_to_char(int32_t dataSupplied, /* Data sourced to function */
         temp++;
     }
     for ( i = bufferSize; i > 0; i-- ) {
-        x = dataSupplied / pwr(10, i);
+        x = dataSupplied / ddl_util_pwr(10, i);
         if ( x == 0 ) {
             if ( nonSignificantZero == 1 ) {
                 *(buffer + i) = ' ';
@@ -283,7 +283,7 @@ void int_to_char(int32_t dataSupplied, /* Data sourced to function */
             nonSignificantZero = 0;
             *(buffer + i) = '0' + x;
         }
-        dataSupplied = dataSupplied % pwr(10, i);
+        dataSupplied = dataSupplied % ddl_util_pwr(10, i);
         if ( i == 1 ) {
             *(buffer) = '0' + dataSupplied;
         }
@@ -294,7 +294,7 @@ void int_to_char(int32_t dataSupplied, /* Data sourced to function */
 /*	Power function (exponents)                                                                     */
 
 /************************************************************************/
-int pwr(int a, int b) {
+int ddl_util_pwr(int a, int b) {
     int t = 1;
     for ( ; b; b-- )
         t = t * a;
