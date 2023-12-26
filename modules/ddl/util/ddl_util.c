@@ -684,12 +684,36 @@ float ddl_util_find_min(float *pDataBuff, int dataBuffLen) {
     if ( !pDataBuff || !dataBuffLen ) {
         return (float) 0;
     }
+
+    int indexI = 0;
+    float minValue = (float) 0;
+
+    minValue = *((float *) pDataBuff);
+    while ( indexI < dataBuffLen ) {
+        minValue = (minValue > *((float *) pDataBuff + indexI)) ? \
+            (minValue = *((float *) pDataBuff + indexI)) : (minValue = minValue);
+        indexI++;
+    }
+
+    return minValue;
 }
 
 float ddl_util_find_max(float *pDataBuff, int dataBuffLen) {
     if ( !pDataBuff || !dataBuffLen ) {
         return (float) 0;
     }
+
+    int indexI = 0;
+    float maxValue = (float) 0;
+
+    maxValue = *((float *) pDataBuff);
+    while ( indexI < dataBuffLen ) {
+        maxValue = (maxValue < *((float *) pDataBuff + indexI)) ? \
+            (maxValue = *((float *) pDataBuff + indexI)) : (maxValue = maxValue);
+        indexI++;
+    }
+
+    return maxValue;
 }
 
 int ddl_util_plot_function_2d(char *pTitleString, char *xLabel, char *yLabel, float *pDataBuff_x, float *pDataBuff_y, int dataPointCount) {
@@ -697,6 +721,7 @@ int ddl_util_plot_function_2d(char *pTitleString, char *xLabel, char *yLabel, fl
         return 1;
     }
 
+#if (defined (__WIN32__)||defined(__WIN64__))
     int indexI = 0;
     float valueMin = ddl_util_find_min(pDataBuff_x, dataPointCount);
     float valueMax = ddl_util_find_max(pDataBuff_x, dataPointCount);
@@ -721,20 +746,44 @@ int ddl_util_plot_function_2d(char *pTitleString, char *xLabel, char *yLabel, fl
     }
 
     indexI = 0;
-    char *commandsForGnuplot [ COMMANDS_POINTS_COUNT ] = { "set title \"CURRENT VS ADC COUNT\"",
-                                                        "set style line 1 lc rgb 'red' pt 7", // #Circle
-                                                        "set yrange [-10:+10]",
-                                                        "set xrange [-10:10]",
-                                                        "set grid xtics 1", // # draw lines for each ytics and mytics
-                                                        "set grid ytics 1", // # draw lines for each ytics and mytics
-                                                        "set grid", //              # enable the grid
-                                                        "plot 'data.temp' with points ls 1" ,
+    char *commandsForGnuplot [ COMMANDS_POINTS_COUNT ] = {
+                                                        "set xtics nomirror", //  nomirror means do not put tics on the opposite side of the plot
+                                                        "set ytics nomirror",
+
+                                                        "set xtics 1", //  On the X axis put a major tick every 1
+                                                        "set ytics 1", //  On the Y axis put a major tick every 1
+
+                                                        "set mxtics 2", //  On both the x and y axes split each space in 2 and put a minor tic there
+                                                        "set mytics 2",
+
+                                                        "set style line 1 lt 0 lc rgb '#808080'", // line style for border
+                                                        "set border 3 back ls 1 ",
+
+                                                        "set style line 2 lt 0 lc rgb '#808080' lw 0.5",
+                                                        "set grid xtics",
+                                                        "set grid ytics",
+                                                        "set grid mxtics",
+                                                        "set grid mytics",
+
+                                                        "set style line 7 lt 1 lc rgb '#0000A0' lw 2 pt 7 ps 1",
+
+                                                        "set grid back ls 2", //              # enable the grid
+
+                                                        "set title \"CURRENT VS ADC COUNT\"",
+                                                        "set yrange [-110:+110]",
+                                                        "set xrange [0:6]",
+                                                        "plot 'data.temp' with points ls 7" ,
                                                         0
     };
+
     while ( commandsForGnuplot [ indexI ] ) {
         fprintf(gnuplotPipe, "%s \n", commandsForGnuplot [ indexI ]); //Send commands to gnuplot one by one.
         indexI++;
     }
 
     return 0;
+
+#else
+    return 1;
+#endif
 }
