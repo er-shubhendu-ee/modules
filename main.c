@@ -105,10 +105,10 @@ void main(int argc, char *argv []) {
     printf("Min: 0x%4.4X\r\n", APP_ADC_COUNT_MIN);
     printf("Mid: 0x%4.4X\r\n", APP_ADC_COUNT_MID);
     printf("Max: 0x%4.4X\r\n", APP_ADC_COUNT_MAX);
-    printf("Input: 0x%4.4X\r\n", SAMPLE_VALUE);
+    printf("ADC Input count: 0x%4.4X\r\n", SAMPLE_VALUE);
 
-    printf("Normalized value: %4.8f\r\n", normalized);
-    printf("Scaled adc input(dec): %4.4f\r\n", scaledAdcInput);
-    printf("Scaled CT input(dec): %4.4f\r\n", scaledCTInput);
+    printf("Normalized value: %4.4f\r\n", normalized);
+    printf("Scaled adc input voltage(dec): %4.4f\r\n", scaledAdcInput);
+    printf("Scaled CT primary current(dec): %4.4f\r\n", scaledCTInput);
 }
 
