@@ -21,6 +21,8 @@
 #define SAMPLE_COUNT 11
 #define BUFFER_SIZE 100
 
+#define SAMPLE_INPUT_VALUE 4.6
+
 float dataSet [][ 2 ] = { {0.27,-100},
                         {0.34,-96},
                         {1.68,-36},
@@ -35,7 +37,7 @@ float dataSet [][ 2 ] = { {0.27,-100},
 
 static int get_sample_count(float *pDataSet);
 
-#define SAMPLE_INPUT_VALUE 4.6
+
 
 
 void main(int argc, char *argv []) {
