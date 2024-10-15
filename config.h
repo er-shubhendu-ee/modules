@@ -7,7 +7,7 @@
  *
  * @copyright
  *
-**/
+ **/
 
 #ifndef __CONFIG_H__
 #define __CONFIG_H__
@@ -21,19 +21,12 @@
 #define CONFIG_QUEUE_POOL_SIZE 10
 #define CONFIG_QUEUE_USE_STATIC 1
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-
-
-
 #ifdef __cplusplus
 }
 #endif
-
-
-
 
 #endif /* @end  __CONFIG_H__*/
