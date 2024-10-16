@@ -11,7 +11,6 @@
 
 #include "ddl_serial.h"
 
-#include <Windows.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -35,30 +34,8 @@ static uint8_t rxQueueBuffer[MAX_QUEUE_SIZE * sizeof(uint8_t)];
 static ddl_queue_handle_t hSerialQueueTx = NULL;
 static ddl_queue_handle_t hSerialQueueRx = NULL;
 
-#if defined _WINDOWS_
-HANDLE ghComPort;  // Handle for the COM port
-#endif
-
 int ddl_serial_init(void) {
     int exeStatus = NO_ERROR;
-
-#if defined _WINDOWS_
-    ghComPort = CreateFile("\\\\.\\COM1",                 // Open the specified COM port
-                           GENERIC_READ | GENERIC_WRITE,  // Read/Write
-                           0,                             // No Sharing
-                           NULL,                          // No Security
-                           OPEN_EXISTING,                 // Open existing port
-                           0,                             // Non Overlapped I/O
-                           NULL);                         // Null for Comm Devices
-
-    if (ghComPort == INVALID_HANDLE_VALUE) {
-        DDL_LOGI(TAG, "Error in opening serial port: %d", GetLastError());
-        exeStatus = ERROR_OPEN_FAILED;  // Set appropriate error code
-        return exeStatus;
-    } else {
-        DDL_LOGI(TAG, "Opening serial port successful");
-    }
-#endif
 
     ddl_serial_port_init();
 
@@ -147,12 +124,6 @@ int ddl_serial_recv(uint8_t* pDataBuff, size_t dataBuffLen, size_t* pBytesReceiv
 int ddl_serial_deinit(void) {
     int exeStatus = NO_ERROR;
 
-#if defined _WINDOWS_
-    if (ghComPort != INVALID_HANDLE_VALUE) {
-        CloseHandle(ghComPort);  // Close the COM port handle
-    }
-#endif
-
     ddl_serial_port_deinit();
 
     // Delete the transmission queue if it exists
@@ -211,14 +182,7 @@ __attribute__((weak)) int ddl_serial_port_deinit(void) { return 0; }
 // Weak attribute definition for transmission
 __attribute__((weak)) int ddl_serial_port_tx_byte(uint8_t value) {
     DDL_LOGI(TAG, "Transmitting value: %02X", value);  // Log transmission
-#if defined _WINDOWS_
-    uint8_t byteTx = value;
-    bool status = WriteFile(ghComPort, &byteTx, sizeof(byteTx), NULL, NULL);
-    if (!status) {
-        DDL_LOGI(TAG, "Error: 0x%8.8X", GetLastError());
-    }
-#endif
-    return 0;  // Indicate success
+    return 0;                                          // Indicate success
 }
 
 // Weak attribute definition for reception
