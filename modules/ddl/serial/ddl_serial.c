@@ -174,7 +174,7 @@ void ddl_serial_task(void* pvParameters) {
 
     // Check if there is data in the TX queue and send it
     if (ddl_queue_recv(hSerialQueueTx, &txValue) == NO_ERROR) {
-        ddl_serial_port_tx(txValue);  // Transmit the byte
+        ddl_serial_port_tx_byte(txValue);  // Transmit the byte
         // Notify the event callback for TX event
         if (gSerialEvent_cb) {
             gSerialEvent_cb(DDL_SERIAL_EVENT_TX);
@@ -182,7 +182,7 @@ void ddl_serial_task(void* pvParameters) {
     }
 
     // Receive a byte from the serial port
-    if (ddl_serial_port_rx(&rxValue) == 0) {  // Assuming 0 indicates success
+    if (ddl_serial_port_rx_byte(&rxValue) == 0) {  // Assuming 0 indicates success
         // Enqueue the received byte to the RX queue
         if (ddl_queue_send(hSerialQueueRx, &rxValue) == NO_ERROR) {
             // Notify the event callback for RX event
@@ -199,7 +199,7 @@ void ddl_serial_task(void* pvParameters) {
 }
 
 // Weak attribute definition for transmission
-__attribute__((weak)) int ddl_serial_port_tx(uint8_t value) {
+__attribute__((weak)) int ddl_serial_port_tx_byte(uint8_t value) {
     DDL_LOGI(TAG, "Transmitting value: %02X", value);  // Log transmission
 #if defined _WINDOWS_
     uint8_t byteTx = value;
@@ -213,7 +213,7 @@ __attribute__((weak)) int ddl_serial_port_tx(uint8_t value) {
 
 // Weak attribute definition for reception
 uint8_t testValue = 0;  // Simulated received value
-__attribute__((weak)) int ddl_serial_port_rx(uint8_t* pValue) {
+__attribute__((weak)) int ddl_serial_port_rx_byte(uint8_t* pValue) {
     *pValue = testValue;  // Simulate receiving a value
     testValue++;
     return 0;  // Indicate success

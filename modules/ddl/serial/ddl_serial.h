@@ -87,7 +87,7 @@ void ddl_serial_task(void* pvParameters);
  * @return 0 on success, negative value on error.
  * @details This function sends a single byte through the serial interface.
  */
-int ddl_serial_port_tx(uint8_t value);
+int ddl_serial_port_tx_byte(uint8_t value);
 
 /**
  * @brief Receive a single byte from the serial port.
@@ -95,6 +95,6 @@ int ddl_serial_port_tx(uint8_t value);
  * @return 0 on success, negative value on error.
  * @details This function retrieves a single byte from the serial interface.
  */
-int ddl_serial_port_rx(uint8_t* pValue);
+int ddl_serial_port_rx_byte(uint8_t* pValue);
 
 #endif /* __DDL_SERIAL_H__ */
