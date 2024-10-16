@@ -28,6 +28,8 @@ static void app_serial_event_cb(ddl_SerialEvent_t event);
 // Global buffer for received data
 uint8_t gDataBuff[CONFIG_SERIAL_DATA_BUFF_SIZE] = {0};
 
+uint8_t gRxByteBuff[CONFIG_SERIAL_DATA_BUFF_SIZE] = {0};
+
 /**
  * @brief      Initializes the application.
  *
@@ -53,7 +55,7 @@ void app_init(void) {
  * @param      pvParameters   Parameters for the task (not used).
  * @return     int           Status code from the serial task function.
  */
-int app_task(void *pvParameters) {
+int app_task(void* pvParameters) {
     ddl_serial_task(NULL);  // Execute the serial task and return its status
     return NO_ERROR;
 }

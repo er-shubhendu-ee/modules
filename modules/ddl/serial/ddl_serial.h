@@ -81,6 +81,10 @@ int ddl_serial_recv(uint8_t* pDataBuff, size_t dataBuffLen, size_t* pBytesReceiv
  */
 void ddl_serial_task(void* pvParameters);
 
+int ddl_serial_port_init(void);
+
+int ddl_serial_port_deinit(void);
+
 /**
  * @brief Transmit a single byte through the serial port.
  * @param[in] value The byte value to transmit.

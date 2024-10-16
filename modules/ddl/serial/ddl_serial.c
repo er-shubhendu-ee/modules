@@ -60,6 +60,8 @@ int ddl_serial_init(void) {
     }
 #endif
 
+    ddl_serial_port_init();
+
     // Create the transmission queue
     hSerialQueueTx = ddl_queue_create_static(sizeof(uint8_t), MAX_QUEUE_SIZE, txQueueBuffer);
     if (hSerialQueueTx == NULL) {
@@ -151,6 +153,8 @@ int ddl_serial_deinit(void) {
     }
 #endif
 
+    ddl_serial_port_deinit();
+
     // Delete the transmission queue if it exists
     if (hSerialQueueTx) {
         ddl_queue_delete(hSerialQueueTx);
@@ -197,6 +201,12 @@ void ddl_serial_task(void* pvParameters) {
         }
     }
 }
+
+// Weak attribute definition for transmission
+__attribute__((weak)) int ddl_serial_port_init(void) { return 0; }
+
+// Weak attribute definition for transmission
+__attribute__((weak)) int ddl_serial_port_deinit(void) { return 0; }
 
 // Weak attribute definition for transmission
 __attribute__((weak)) int ddl_serial_port_tx_byte(uint8_t value) {
