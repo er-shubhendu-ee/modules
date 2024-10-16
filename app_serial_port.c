@@ -111,16 +111,30 @@ DWORD WINAPI ThreadFunction1(LPVOID lpParam) {
     while (1) {
         // Your continuous task for thread 1
         DDL_LOGI(TAG, "Thread 1 is running.");
-        Sleep(10);  // Sleep for 1 second
+        ddl_serial_task(NULL);  // Execute the serial task and return its status
+        Sleep(10);              // Sleep for 1 second
     }
     return 0;
 }
 
 // Continuous task for the second thread
 DWORD WINAPI app_thread_rx_byte(LPVOID lpParam) {
+    uint8_t byteReceived;
+    DWORD bytesRead;
     while (1) {
         // Your continuous task for thread 2
         DDL_LOGI(TAG, "Thread 2 is running.");
+        // Attempt to read data from the COM port
+        if (ReadFile(ghComPort, &byteReceived, sizeof(byteReceived), &bytesRead, NULL)) {
+            if (bytesRead > 0) {
+                // Send received bytes to the queue
+                for (size_t i = 0; i < bytesRead; i++) {
+                    ddl_queue_send(ghQueue_rxStream, &byteReceived);
+                }
+            }
+        } else {
+            DDL_LOGI(TAG, "Error reading from serial port: %d", GetLastError());
+        }
         Sleep(10);  // Sleep for 1 second
     }
     return 0;

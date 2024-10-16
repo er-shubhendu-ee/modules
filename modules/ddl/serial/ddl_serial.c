@@ -147,6 +147,10 @@ void ddl_serial_task(void* pvParameters) {
     uint8_t txValue;  // Variable to hold the value to send
     uint8_t rxValue;  // Variable to hold the received value
 
+    if (NULL == hSerialQueueTx || NULL == hSerialQueueRx) {
+        return;
+    }
+
     // Check if there is data in the TX queue and send it
     if (ddl_queue_recv(hSerialQueueTx, &txValue) == NO_ERROR) {
         ddl_serial_port_tx_byte(txValue);  // Transmit the byte

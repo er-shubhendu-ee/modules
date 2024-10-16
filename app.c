@@ -55,7 +55,7 @@ void app_init(void) {
  * @return     int           Status code from the serial task function.
  */
 int app_task(void* pvParameters) {
-    ddl_serial_task(NULL);  // Execute the serial task and return its status
+    // ddl_serial_task(NULL);  // Execute the serial task and return its status
     return NO_ERROR;
 }
 
