@@ -17,9 +17,14 @@
 
 //
 #include "ddl_log.h"
+#include "ddl_queue.h"
 #include "ddl_serial.h"
+#include "error.h"
 
 #define TAG "APP_SERIAL_PORT"
+
+uint8_t gBuff_rxStreamQueue[128];
+ddl_queue_handle_t ghQueue_rxStream;
 
 #if defined _WINDOWS_
 HANDLE ghComPort;  // Handle for the COM port
@@ -31,6 +36,14 @@ DWORD WINAPI app_thread_rx_byte(LPVOID lpParam);
 int ddl_serial_port_init(void) {
     int exeStatus = NO_ERROR;
 
+    ghQueue_rxStream =
+        ddl_queue_create_static(sizeof(uint8_t), sizeof(gBuff_rxStreamQueue), gBuff_rxStreamQueue);
+    if (NULL == ghQueue_rxStream) {
+        DDL_LOGE(TAG, "Error in queue creation.");
+        exeStatus = ERROR_NOT_ENOUGH_MEMORY;
+        goto label_exitPoint;
+    }
+
 #if defined _WINDOWS_
     // Create two threads for continuous functions
     HANDLE thread1 = CreateThread(NULL, 0, ThreadFunction1, NULL, 0, NULL);
@@ -39,6 +52,8 @@ int ddl_serial_port_init(void) {
     // Optionally check if threads were created successfully
     if (thread1 == NULL || thread2 == NULL) {
         DDL_LOGI(TAG, "Failed to create threads");
+        exeStatus = ERROR_NOT_ENOUGH_MEMORY;
+        goto label_exitPoint;
     }
 
     ghComPort = CreateFile("\\\\.\\COM1",                 // Open the specified COM port
@@ -52,12 +67,13 @@ int ddl_serial_port_init(void) {
     if (ghComPort == INVALID_HANDLE_VALUE) {
         DDL_LOGI(TAG, "Error in opening serial port: %d", GetLastError());
         exeStatus = ERROR_OPEN_FAILED;  // Set appropriate error code
-        return exeStatus;
+        goto label_exitPoint;
     } else {
         DDL_LOGI(TAG, "Opening serial port successful");
     }
 #endif
-    return 0;
+label_exitPoint:
+    return exeStatus;
 }
 
 int ddl_serial_port_deinit(void) {
@@ -82,8 +98,12 @@ int ddl_serial_port_tx_byte(uint8_t value) {
 }
 
 int ddl_serial_port_rx_byte(uint8_t* pValue) {
-    *pValue = 'A';
-    return 0;  // Indicate success
+    uint8_t rxByte = 0;
+    if (DDL_BASE_STATUS_OK == ddl_queue_recv(ghQueue_rxStream, &rxByte)) {
+        *pValue = rxByte;
+        return 0;  // Indicate success
+    }
+    return -1;  // Indicate failure
 }
 
 // Continuous task for the first thread
