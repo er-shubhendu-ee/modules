@@ -23,11 +23,24 @@
 
 #if defined _WINDOWS_
 HANDLE ghComPort;  // Handle for the COM port
+// Thread function prototypes
+DWORD WINAPI ThreadFunction1(LPVOID lpParam);
+DWORD WINAPI app_thread_rx_byte(LPVOID lpParam);
 #endif
 
 int ddl_serial_port_init(void) {
     int exeStatus = NO_ERROR;
+
 #if defined _WINDOWS_
+    // Create two threads for continuous functions
+    HANDLE thread1 = CreateThread(NULL, 0, ThreadFunction1, NULL, 0, NULL);
+    HANDLE thread2 = CreateThread(NULL, 0, app_thread_rx_byte, NULL, 0, NULL);
+
+    // Optionally check if threads were created successfully
+    if (thread1 == NULL || thread2 == NULL) {
+        DDL_LOGI(TAG, "Failed to create threads");
+    }
+
     ghComPort = CreateFile("\\\\.\\COM1",                 // Open the specified COM port
                            GENERIC_READ | GENERIC_WRITE,  // Read/Write
                            0,                             // No Sharing
@@ -71,4 +84,24 @@ int ddl_serial_port_tx_byte(uint8_t value) {
 int ddl_serial_port_rx_byte(uint8_t* pValue) {
     *pValue = 'A';
     return 0;  // Indicate success
+}
+
+// Continuous task for the first thread
+DWORD WINAPI ThreadFunction1(LPVOID lpParam) {
+    while (1) {
+        // Your continuous task for thread 1
+        DDL_LOGI(TAG, "Thread 1 is running.");
+        Sleep(10);  // Sleep for 1 second
+    }
+    return 0;
+}
+
+// Continuous task for the second thread
+DWORD WINAPI app_thread_rx_byte(LPVOID lpParam) {
+    while (1) {
+        // Your continuous task for thread 2
+        DDL_LOGI(TAG, "Thread 2 is running.");
+        Sleep(10);  // Sleep for 1 second
+    }
+    return 0;
 }

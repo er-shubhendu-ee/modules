@@ -14,9 +14,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-//
-#include <windows.h>
-
 // Include application-specific headers
 #include "app.h"
 #include "config.h"
@@ -32,12 +29,6 @@ static void app_serial_event_cb(ddl_SerialEvent_t event);
 // Global buffer for received data
 uint8_t gDataBuff[CONFIG_SERIAL_DATA_BUFF_SIZE] = {0};
 
-uint8_t gRxByteBuff[CONFIG_SERIAL_DATA_BUFF_SIZE] = {0};
-
-// Thread function prototypes
-DWORD WINAPI ThreadFunction1(LPVOID lpParam);
-DWORD WINAPI ThreadFunction2(LPVOID lpParam);
-
 /**
  * @brief      Initializes the application.
  *
@@ -45,15 +36,6 @@ DWORD WINAPI ThreadFunction2(LPVOID lpParam);
  * callback for serial events. It also sends an initial message.
  */
 void app_init(void) {
-    // Create two threads for continuous functions
-    HANDLE thread1 = CreateThread(NULL, 0, ThreadFunction1, NULL, 0, NULL);
-    HANDLE thread2 = CreateThread(NULL, 0, ThreadFunction2, NULL, 0, NULL);
-
-    // Optionally check if threads were created successfully
-    if (thread1 == NULL || thread2 == NULL) {
-        DDL_LOGI(TAG, "Failed to create threads");
-    }
-
     ddl_serial_init();                            // Initialize the serial communication
     ddl_serial_register_cb(app_serial_event_cb);  // Register the event callback function
 
@@ -137,24 +119,4 @@ static void app_serial_event_cb(ddl_SerialEvent_t event) {
             DDL_LOGI(TAG, "Undefined event");
             break;
     }
-}
-
-// Continuous task for the first thread
-DWORD WINAPI ThreadFunction1(LPVOID lpParam) {
-    while (1) {
-        // Your continuous task for thread 1
-        DDL_LOGI(TAG, "Thread 1 is running.");
-        Sleep(1000);  // Sleep for 1 second
-    }
-    return 0;
-}
-
-// Continuous task for the second thread
-DWORD WINAPI ThreadFunction2(LPVOID lpParam) {
-    while (1) {
-        // Your continuous task for thread 2
-        DDL_LOGI(TAG, "Thread 2 is running.");
-        Sleep(1000);  // Sleep for 1 second
-    }
-    return 0;
 }
