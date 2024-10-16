@@ -39,7 +39,7 @@ void app_init(void) {
     ddl_serial_register_cb(app_serial_event_cb);  // Register the event callback function
 
     // Send initialization message and check for success
-    if (ddl_serial_send("Init ok.\r\n", sizeof("Init ok.\r\n")) != NO_ERROR) {
+    if (ddl_serial_send("Init ok.\r\n", sizeof("Init ok.\r\n"), NULL) != NO_ERROR) {
         DDL_LOGI(TAG, "Failed to send initialization message");
     }
 }
@@ -77,6 +77,8 @@ void app_deinit(void) {
  * @param      event   The event type that occurred.
  */
 static void app_serial_event_cb(ddl_SerialEvent_t event) {
+    size_t receivedBytesCount = 0;
+
     switch (event) {
         case DDL_SERIAL_EVENT_NONE:  // No event occurred
             DDL_LOGI(TAG, "DDL_SERIAL_EVENT_NONE");
@@ -84,7 +86,8 @@ static void app_serial_event_cb(ddl_SerialEvent_t event) {
 
         case DDL_SERIAL_EVENT_RX:  // Data has been received
             DDL_LOGI(TAG, "DDL_SERIAL_EVENT_RX");
-            if (ddl_serial_recv(gDataBuff, sizeof(gDataBuff)) == NO_ERROR) {  // Receive data
+            ddl_serial_recv(gDataBuff, sizeof(gDataBuff), &receivedBytesCount);
+            if (receivedBytesCount) {                                   // Receive data
                 DDL_LOGI(TAG, "Received data: 0x%2.2X", gDataBuff[0]);  // Log the received data
             } else {
                 DDL_LOGI(TAG, "Failed to receive data");

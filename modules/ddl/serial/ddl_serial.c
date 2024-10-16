@@ -93,7 +93,7 @@ void ddl_serial_register_cb(ddl_serial_event_cb_t callback) {
     gSerialEvent_cb = callback;  // Registers a callback function for serial events
 }
 
-int ddl_serial_send(uint8_t* pDataBuff, size_t dataBuffLen) {
+int ddl_serial_send(uint8_t* pDataBuff, size_t dataBuffLen, size_t* pBytesSentCount) {
     int exeStatus = NO_ERROR;
 
     // Validate input parameters
@@ -107,6 +107,8 @@ int ddl_serial_send(uint8_t* pDataBuff, size_t dataBuffLen) {
         exeStatus = ddl_queue_send(hSerialQueueTx, &pDataBuff[i]);
         if (exeStatus != NO_ERROR) {
             break;  // Exit on error
+        } else if (pBytesSentCount) {
+            *((size_t*)pBytesSentCount) += 1;
         }
     }
 
@@ -118,7 +120,7 @@ int ddl_serial_send(uint8_t* pDataBuff, size_t dataBuffLen) {
     return exeStatus;  // Return status code
 }
 
-int ddl_serial_recv(uint8_t* pDataBuff, size_t dataBuffLen) {
+int ddl_serial_recv(uint8_t* pDataBuff, size_t dataBuffLen, size_t* pBytesReceivedCount) {
     int exeStatus = NO_ERROR;
 
     // Validate input parameters
@@ -132,6 +134,8 @@ int ddl_serial_recv(uint8_t* pDataBuff, size_t dataBuffLen) {
         exeStatus = ddl_queue_recv(hSerialQueueRx, &pDataBuff[i]);
         if (exeStatus != NO_ERROR) {
             break;  // Exit on error
+        } else if (pBytesReceivedCount) {
+            *((size_t*)pBytesReceivedCount) += 1;
         }
     }
 

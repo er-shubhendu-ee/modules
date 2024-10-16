@@ -62,7 +62,7 @@ int ddl_serial_deinit(void);
  * @return 0 on success, negative value on error.
  * @details This function enqueues data for transmission over the serial interface.
  */
-int ddl_serial_send(uint8_t* pDataBuff, size_t dataBuffLen);
+int ddl_serial_send(uint8_t* pDataBuff, size_t dataBuffLen, size_t* pBytesSentCount);
 
 /**
  * @brief Receive data from the serial interface.
@@ -72,7 +72,7 @@ int ddl_serial_send(uint8_t* pDataBuff, size_t dataBuffLen);
  * @details This function retrieves data received from the serial interface and stores it in the
  * provided buffer.
  */
-int ddl_serial_recv(uint8_t* pDataBuff, size_t dataBuffLen);
+int ddl_serial_recv(uint8_t* pDataBuff, size_t dataBuffLen, size_t* pBytesReceivedCount);
 
 /**
  * @brief Task for handling serial data processing.
