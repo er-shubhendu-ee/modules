@@ -21,7 +21,12 @@
         "limits": "c",
         "memory": "c",
         "new": "c",
-        "functional": "c"
+        "functional": "c",
+        "windows.h": "c",
+        "stddef.h": "c",
+        "ddl_serial.h": "c",
+        "test_event.h": "c",
+        "stdio.h": "c"
     },
     "C_Cpp.default.customConfigurationVariables": {},
     "C_Cpp.default.includePath": [

@@ -2,18 +2,17 @@
  * @file      ddl_base.h
  * @author:   Shubhendu B B
  * @date:     02/02/2023
- * @brief
- * @details
+ * @brief     Base definitions and type declarations
+ * @details   This header file defines common types, macros, and data structures
+ *            used throughout the project, including data type unions, status enums,
+ *            and date-time structures.
  *
- * @copyright
- *
+ * @copyright (c) 2023 Shubhendu B B. All rights reserved.
  **/
 
 #ifndef __DDL_BASE_H__
 #define __DDL_BASE_H__
 
-#include <stdbool.h>
-#include <stdint.h>
 #include <complex.h>
 #include <inttypes.h>
 #include <iso646.h>
@@ -26,6 +25,7 @@
 #include <wchar.h>
 #include <wctype.h>
 
+// Define boolean types
 #ifndef BOOL
 #define BOOL bool
 #endif
@@ -38,14 +38,7 @@
 #define TRUE !FALSE
 #endif
 
-#ifndef false
-#define false 0
-#endif
-
-#ifndef true
-#define true !false
-#endif
-
+// Define carriage return and line feed constants
 #ifndef CR
 #define CR 0x0D
 #endif
@@ -54,14 +47,12 @@
 #define LF 0x0A
 #endif
 
+// Bit manipulation macros
 #ifndef BIT_SHIFT
 #define BIT_SHIFT(DWORD, BITPOSITION) ((DWORD) |= (1 << (BITPOSITION)))
 #endif
 
- // #define bitclear(value,nbit) ((value) &= ~(1<<(nbit)))
- // #define bitflip(value,nbit)  ((value) ^=  (1<<(nbit)))
- // #define bitcheck(value,nbit) ((value) &   (1<<(nbit)))
-
+// Type definitions for byte and word sizes
 #ifndef BYTE
 #define BYTE uint8_t
 #endif
@@ -70,20 +61,23 @@
 #define WORD uint16_t
 #endif
 
+// String macros
 #ifndef STRING
 #define STRING(x) #x
 #define STR(x) STRING(x)
 #endif
 
-
+// Define unsigned char type
 #ifndef uchar_t
 typedef unsigned char uchar_t;
 #endif
 
+// Type definitions for various sizes
 #ifndef uint8_t
 typedef unsigned char uint8_t;
 #endif
 
+// Define HIGH and LOW constants
 #ifndef HIGH
 #define HIGH 1u
 #endif
@@ -92,6 +86,7 @@ typedef unsigned char uint8_t;
 #define LOW 0u
 #endif
 
+// Define ON and OFF constants
 #ifndef ON
 #define ON 1u
 #endif
@@ -100,14 +95,7 @@ typedef unsigned char uint8_t;
 #define OFF 0u
 #endif
 
-#ifndef TRUE
-#define TRUE 1u
-#endif
-
-#ifndef FALSE
-#define FALSE 0u
-#endif
-
+// Define pass and fail constants
 #ifndef PASS
 #define PASS 1u
 #endif
@@ -116,9 +104,7 @@ typedef unsigned char uint8_t;
 #define FAIL 0u
 #endif
 
-/* 	#define Min_Data 0x0
-    #define Max_Data 0xF */
-
+// Enumeration for base data types
 typedef enum {
     CHAR8_T,
     UCHAR8_T,
@@ -131,29 +117,23 @@ typedef enum {
     UINT32_T,
     INT64_T,
     UINT64_T,
-    FLOAT,
+    FLOAT_T,
     FLOAT64_T,
-    LONG,
-    LONG_LONG,
-    DOUBLE,
-    STRING
+    LONG_T,
+    LONG_LONG_T,
+    DOUBLE_T,
+    STRING_T
 } ddl_base_type_t;
 
-typedef enum {
-    BIT0,
-    BIT1,
-    BIT2,
-    BIT3,
-    BIT4,
-    BIT5,
-    BIT6,
-    BIT7
-} ddl_base_bit_t;
+// Enumeration for bit positions
+typedef enum { BIT0, BIT1, BIT2, BIT3, BIT4, BIT5, BIT6, BIT7 } ddl_base_bit_t;
 
+// Type definition for boolean
 #ifndef bool
 #define bool _Bool
 #endif
 
+// Union for byte representation
 typedef union {
     unsigned char value;
     struct {
@@ -168,6 +148,7 @@ typedef union {
     };
 } ddl_base_byte_t;
 
+// Union for word representation
 typedef union {
     uint16_t value;
     struct {
@@ -194,6 +175,7 @@ typedef union {
     };
 } ddl_base_word_t;
 
+// Union for double word representation
 typedef union {
     uint32_t value;
     struct {
@@ -242,6 +224,7 @@ typedef union {
     };
 } ddl_base_dword_t;
 
+// Union for quad word representation
 typedef union {
     uint64_t value;
     struct {
@@ -332,6 +315,7 @@ typedef union {
     };
 } ddl_base_ddword_t;
 
+// Type definitions for additional sizes
 #ifndef byte_t
 #define byte_t unsigned char
 #endif
@@ -364,6 +348,7 @@ typedef union {
 #define real64_t double
 #endif
 
+// Enumeration for date formats
 typedef enum {
     DDMMYY,
     DDMMYYYY,
@@ -375,39 +360,42 @@ typedef enum {
     MMMDDYYYY,
 } ddl_base_date_format_t;
 
+// Structure for time of day representation
 typedef struct {
-    uint8_t dd;
-    uint8_t mm;
-    uint8_t yy;
-    uint8_t day;
-    uint8_t hr;
-    uint8_t min;
-    uint8_t sec;
-    uint8_t ms;
-    unsigned timeFormat : 1;         // default(0):24 hour; 1 = AM/PM
-    unsigned meridianIndicator : 1;  // default(0):AM ; 1 = PM
-    ddl_base_date_format_t dateFormatType;
+    uint8_t dd;                             // Day
+    uint8_t mm;                             // Month
+    uint8_t yy;                             // Year
+    uint8_t day;                            // Day of the week
+    uint8_t hr;                             // Hour
+    uint8_t min;                            // Minute
+    uint8_t sec;                            // Second
+    uint8_t ms;                             // Millisecond
+    unsigned timeFormat : 1;                // 0: 24-hour, 1: AM/PM
+    unsigned meridianIndicator : 1;         // 0: AM, 1: PM
+    ddl_base_date_format_t dateFormatType;  // Date format type
 } ddl_base_tod_t;
 
+// Structure for ADC data representation
 typedef struct {
-    uint8_t channelNumber;
-    real32_t channelValue;
+    uint8_t channelNumber;  // ADC channel number
+    real32_t channelValue;  // ADC channel value
 } ddl_base_adcData_t;
 
+// Structure for edge processing buffer
 typedef struct {
-    unsigned lastState : 1;
-    unsigned currentState : 1;
-    unsigned positiveEdge : 1;
-    unsigned negativeEdge : 1;
-    unsigned level : 1;
-    unsigned highLevel : 1;
-    unsigned lowLevel : 1;
+    unsigned lastState : 1;     // Last state
+    unsigned currentState : 1;  // Current state
+    unsigned positiveEdge : 1;  // Positive edge detected
+    unsigned negativeEdge : 1;  // Negative edge detected
+    unsigned level : 1;         // Current level
+    unsigned highLevel : 1;     // High level detected
+    unsigned lowLevel : 1;      // Low level detected
 } ddl_base_edgeProcessBuffer_t;
 
+// Enumeration for status codes
 typedef enum {
     DDL_BASE_STATUS_OK = 0,
     DDL_BASE_STATUS_BUSY,
-
     DDL_BASE_STATUS_ERROR = -1,
 } ddl_base_status_t;
 

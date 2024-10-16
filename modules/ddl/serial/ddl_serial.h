@@ -30,24 +30,28 @@ typedef enum {
 
 /**
  * @brief Function pointer type for event callbacks.
+ * @param event The event that occurred.
  */
 typedef void (*ddl_serial_event_cb_t)(ddl_SerialEvent_t event);
 
 /**
  * @brief Register a callback function for serial events.
  * @param[in] callback Pointer to the callback function.
+ *                    This function will be called when a serial event occurs.
  */
 void ddl_serial_register_cb(ddl_serial_event_cb_t callback);
 
 /**
  * @brief Initialize the serial interface.
  * @return 0 on success, negative value on failure.
+ * @details This function sets up the serial interface for communication.
  */
 int ddl_serial_init(void);
 
 /**
  * @brief Deinitialize the serial interface.
  * @return 0 on success, negative value on failure.
+ * @details This function cleans up resources used by the serial interface.
  */
 int ddl_serial_deinit(void);
 
@@ -56,6 +60,7 @@ int ddl_serial_deinit(void);
  * @param[in] pDataBuff Pointer to the data buffer to send.
  * @param[in] dataBuffLen Length of the data buffer.
  * @return 0 on success, negative value on error.
+ * @details This function enqueues data for transmission over the serial interface.
  */
 int ddl_serial_send(uint8_t* pDataBuff, size_t dataBuffLen);
 
@@ -64,12 +69,15 @@ int ddl_serial_send(uint8_t* pDataBuff, size_t dataBuffLen);
  * @param[out] pDataBuff Pointer to the buffer where received data will be stored.
  * @param[in] dataBuffLen Length of the buffer.
  * @return 0 on success, negative value on error.
+ * @details This function retrieves data received from the serial interface and stores it in the
+ * provided buffer.
  */
 int ddl_serial_recv(uint8_t* pDataBuff, size_t dataBuffLen);
 
 /**
  * @brief Task for handling serial data processing.
- * @param[in] pvParameters Parameters for the task.
+ * @param[in] pvParameters Parameters for the task, can be NULL.
+ * @details This function processes incoming and outgoing serial data.
  */
 void ddl_serial_task(void* pvParameters);
 
@@ -77,6 +85,7 @@ void ddl_serial_task(void* pvParameters);
  * @brief Transmit a single byte through the serial port.
  * @param[in] value The byte value to transmit.
  * @return 0 on success, negative value on error.
+ * @details This function sends a single byte through the serial interface.
  */
 int ddl_serial_port_tx(uint8_t value);
 
@@ -84,6 +93,7 @@ int ddl_serial_port_tx(uint8_t value);
  * @brief Receive a single byte from the serial port.
  * @param[out] pValue Pointer to store the received byte.
  * @return 0 on success, negative value on error.
+ * @details This function retrieves a single byte from the serial interface.
  */
 int ddl_serial_port_rx(uint8_t* pValue);
 
