@@ -1,24 +1,20 @@
 /**
  * @file      main.c
  * @author:   Shubhendu B B
- * @date:     04/02/2023
- * @brief     Main entry point for the application
- * @details   This file contains the main function, which initializes
- *            the application and enters the main task loop.
+ * @date:     13/10/2024
+ * @brief
+ * @details
  *
- * @copyright (c) 2023 Shubhendu B B. All rights reserved.
+ * @copyright
+ *
  **/
 
-// Include Windows-specific headers (if applicable)
 #include <Windows.h>
-
-// Standard library headers
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
-// Application-specific headers
 #include "app.h"
 #include "ddl_evt.h"
 #include "ddl_log.h"
@@ -32,12 +28,14 @@
 int main(void) {
     int exeStatus = NO_ERROR;  // Initialize execution status
 
-    app_init();  // Initialize the application
+    DDL_LOGI(TAG, "Initializing application...");  // Log initialization
+    app_init();                                    // Initialize the application
 
     // Main loop: continuously process application tasks until an error occurs
     while (NO_ERROR == exeStatus) {
-        app_task(NULL);  // Execute the application task
+        exeStatus = app_task(NULL);  // Execute the application task
     }
 
-    return 0;  // Return status to the operating system
+    DDL_LOGI(TAG, "Exiting application with status: %d", exeStatus);  // Log exit status
+    return exeStatus;  // Return status to the operating system
 }

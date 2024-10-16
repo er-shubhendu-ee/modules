@@ -1,26 +1,25 @@
 /**
  * @file      ddl_serial.c
  * @author:   Shubhendu B B
- * @date:     16/10/2023
- * @brief     Serial communication handling
- * @details   Implements functions for initializing, sending,
- *            receiving, and managing serial communication,
- *            including event handling via queues.
+ * @date:     13/10/2024
+ * @brief
+ * @details
  *
- * @copyright (c) 2023 Shubhendu B B. All rights reserved.
+ * @copyright
+ *
  **/
 
 #include "ddl_serial.h"
 
 #include <Windows.h>
-#include <stddef.h>  // For size_t
-#include <stdint.h>  // For uint8_t
-#include <stdio.h>   // For printf
-#include <string.h>  // For string functions
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 
-#include "ddl_log.h"    // For logging functionality
-#include "ddl_queue.h"  // For queue management
-#include "error.h"      // For error definitions
+#include "ddl_log.h"
+#include "ddl_queue.h"
+#include "error.h"
 
 #define TAG "DDL_SERIAL"           // Tag for logging from this module
 #define LOG_LEVEL LOG_LEVEL_DEBUG  // Define the logging level
@@ -41,7 +40,6 @@ HANDLE ghComPort;  // Handle for the COM port
 #endif
 
 int ddl_serial_init(void) {
-    // Initializes the serial communication, opens the COM port, and sets up queues
     int exeStatus = NO_ERROR;
 
 #if defined _WINDOWS_
@@ -53,10 +51,13 @@ int ddl_serial_init(void) {
                            0,                             // Non Overlapped I/O
                            NULL);                         // Null for Comm Devices
 
-    if (ghComPort == INVALID_HANDLE_VALUE)
-        printf("Error in opening serial port\r\n");
-    else
-        printf("Opening serial port successful\r\n");
+    if (ghComPort == INVALID_HANDLE_VALUE) {
+        DDL_LOGI(TAG, "Error in opening serial port: %d", GetLastError());
+        exeStatus = ERROR_OPEN_FAILED;  // Set appropriate error code
+        return exeStatus;
+    } else {
+        DDL_LOGI(TAG, "Opening serial port successful");
+    }
 #endif
 
     // Create the transmission queue
@@ -89,12 +90,10 @@ label_exitPoint:
 }
 
 void ddl_serial_register_cb(ddl_serial_event_cb_t callback) {
-    // Registers a callback function for serial events
-    gSerialEvent_cb = callback;
+    gSerialEvent_cb = callback;  // Registers a callback function for serial events
 }
 
 int ddl_serial_send(uint8_t* pDataBuff, size_t dataBuffLen) {
-    // Sends data via the serial port by enqueuing it for transmission
     int exeStatus = NO_ERROR;
 
     // Validate input parameters
@@ -120,7 +119,6 @@ int ddl_serial_send(uint8_t* pDataBuff, size_t dataBuffLen) {
 }
 
 int ddl_serial_recv(uint8_t* pDataBuff, size_t dataBuffLen) {
-    // Receives data from the serial port by dequeuing it into the provided buffer
     int exeStatus = NO_ERROR;
 
     // Validate input parameters
@@ -141,11 +139,12 @@ int ddl_serial_recv(uint8_t* pDataBuff, size_t dataBuffLen) {
 }
 
 int ddl_serial_deinit(void) {
-    // Deinitializes the serial communication and cleans up resources
     int exeStatus = NO_ERROR;
 
 #if defined _WINDOWS_
-    CloseHandle(ghComPort);  // Close the COM port handle
+    if (ghComPort != INVALID_HANDLE_VALUE) {
+        CloseHandle(ghComPort);  // Close the COM port handle
+    }
 #endif
 
     // Delete the transmission queue if it exists
@@ -164,7 +163,6 @@ int ddl_serial_deinit(void) {
 }
 
 void ddl_serial_task(void* pvParameters) {
-    // Handles sending and receiving of serial data in a task
     (void)pvParameters;  // Ignore unused parameter
 
     uint8_t txValue;  // Variable to hold the value to send
@@ -198,14 +196,12 @@ void ddl_serial_task(void* pvParameters) {
 
 // Weak attribute definition for transmission
 __attribute__((weak)) int ddl_serial_port_tx(uint8_t value) {
-    // Default implementation for sending a value (can be overridden)
-    printf("Transmitting value: %02X\n", value);
-    // Windows-specific code for transmission
+    DDL_LOGI(TAG, "Transmitting value: %02X", value);  // Log transmission
 #if defined _WINDOWS_
     uint8_t byteTx = value;
     bool status = WriteFile(ghComPort, &byteTx, sizeof(byteTx), NULL, NULL);
     if (!status) {
-        printf("Error: 0x%8.8X\r\n", GetLastError());
+        DDL_LOGI(TAG, "Error: 0x%8.8X", GetLastError());
     }
 #endif
     return 0;  // Indicate success
@@ -214,7 +210,6 @@ __attribute__((weak)) int ddl_serial_port_tx(uint8_t value) {
 // Weak attribute definition for reception
 uint8_t testValue = 0;  // Simulated received value
 __attribute__((weak)) int ddl_serial_port_rx(uint8_t* pValue) {
-    // Default implementation for receiving a value (can be overridden)
     *pValue = testValue;  // Simulate receiving a value
     testValue++;
     return 0;  // Indicate success

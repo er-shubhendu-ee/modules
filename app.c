@@ -1,14 +1,13 @@
 /**
  * @file      app.c
  * @author:   Shubhendu B B
- * @date:     16/10/2024
+ * @date:     15/10/2024
  * @brief
  * @details
  *
  * @copyright
  *
  **/
-
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,6 +18,7 @@
 #include "config.h"
 #include "ddl_log.h"
 #include "ddl_serial.h"
+#include "error.h"
 
 #define TAG "APP"  // Define a tag for logging purposes
 
@@ -37,7 +37,11 @@ uint8_t gDataBuff[CONFIG_SERIAL_DATA_BUFF_SIZE] = {0};
 void app_init(void) {
     ddl_serial_init();                            // Initialize the serial communication
     ddl_serial_register_cb(app_serial_event_cb);  // Register the event callback function
-    ddl_serial_send("Init ok.\r\n", sizeof("Init ok.\r\n"));  // Send initialization message
+
+    // Send initialization message and check for success
+    if (ddl_serial_send("Init ok.\r\n", sizeof("Init ok.\r\n")) != NO_ERROR) {
+        DDL_LOGI(TAG, "Failed to send initialization message");
+    }
 }
 
 /**
@@ -50,7 +54,8 @@ void app_init(void) {
  * @return     int           Status code from the serial task function.
  */
 int app_task(void *pvParameters) {
-    ddl_serial_task(NULL);  // Execute the serial task
+    ddl_serial_task(NULL);  // Execute the serial task and return its status
+    return NO_ERROR;
 }
 
 /**
@@ -59,7 +64,8 @@ int app_task(void *pvParameters) {
  * This function cleans up resources allocated during initialization.
  */
 void app_deinit(void) {
-    ddl_serial_deinit();  // Deinitialize the serial communication
+    ddl_serial_deinit();                          // Deinitialize the serial communication
+    DDL_LOGI(TAG, "Application deinitialized.");  // Log deinitialization
 }
 
 /**
@@ -78,8 +84,11 @@ static void app_serial_event_cb(ddl_SerialEvent_t event) {
 
         case DDL_SERIAL_EVENT_RX:  // Data has been received
             DDL_LOGI(TAG, "DDL_SERIAL_EVENT_RX");
-            ddl_serial_recv(gDataBuff, 1);                          // Receive one byte of data
-            DDL_LOGI(TAG, "Received data: 0x%2.2X", gDataBuff[0]);  // Log the received data
+            if (ddl_serial_recv(gDataBuff, sizeof(gDataBuff)) == NO_ERROR) {  // Receive data
+                DDL_LOGI(TAG, "Received data: 0x%2.2X", gDataBuff[0]);  // Log the received data
+            } else {
+                DDL_LOGI(TAG, "Failed to receive data");
+            }
             break;
 
         case DDL_SERIAL_EVENT_TX:  // Data has been transmitted
