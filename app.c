@@ -35,6 +35,14 @@ static uint8_t gdataBuffValidIndex = 0;
 // Global buffer for received data
 uint8_t gDataBuff[CONFIG_SERIAL_DATA_BUFF_SIZE] = {0};
 
+// TODO:
+// 1. declare an app notification queue
+// 2. initialize the queue inside init function
+
+// TODO:
+// declare app notification poster function
+// declare app notification dispatcher function
+
 /**
  * @brief      Initializes the application.
  *
@@ -100,19 +108,21 @@ static void app_serial_event_cb(ddl_SerialEvent_t event) {
             ddl_serial_recv((uint8_t*)gDataBuff + gdataBuffValidIndex,
                             sizeof(gDataBuff) - gdataBuffValidIndex, &receivedBytesCount);
             gdataBuffValidIndex = gdataBuffValidIndex + (uint8_t)receivedBytesCount;
-            if (gdataBuffValidIndex) {
-                printf("%c", *((uint8_t*)gDataBuff + gdataBuffValidIndex - 1));
-            }
             if (gdataBuffValidIndex >= sizeof(gDataBuff)) {
                 gdataBuffValidIndex = 0;
-#if LOG_LEVEL > LOG_LEVEL_NONE
-                DDL_LOGE(TAG, "Error");
+#if LOG_LEVEL >= LOG_LEVEL_ERROR
+                DDL_LOGE(TAG, "Buffer overflow.");
 #endif
             }
             if (receivedBytesCount) {
 #if LOG_LEVEL >= LOG_LEVEL_VERBOSE                                      // Receive data
                 DDL_LOGI(TAG, "Received data: 0x%2.2X", gDataBuff[0]);  // Log the received data
 #endif
+                // TODO:
+                // check for delimiter string/character.
+                // if delimiter received, copy buffer content and notify to app notification queue
+                // from where it'll be collected by the dispatcher and dispatched to the parser for
+                // i2c send
             } else {
 #if LOG_LEVEL >= LOG_LEVEL_VERBOSE
                 DDL_LOGI(TAG, "Failed to receive data");
@@ -157,3 +167,7 @@ static void app_serial_event_cb(ddl_SerialEvent_t event) {
             break;
     }
 }
+
+// TODO:
+// implement app notification poster function
+// implement app notification dispatcher function
