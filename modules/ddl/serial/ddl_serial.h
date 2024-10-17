@@ -57,17 +57,19 @@ int ddl_serial_deinit(void);
 
 /**
  * @brief Send data through the serial interface.
- * @param[in] pDataBuff Pointer to the data buffer to send.
+ * @param[in] pDataBuff Pointer to the data buffer to send (const).
  * @param[in] dataBuffLen Length of the data buffer.
+ * @param[out] pBytesSentCount Pointer to store the count of bytes sent.
  * @return 0 on success, negative value on error.
  * @details This function enqueues data for transmission over the serial interface.
  */
-int ddl_serial_send(uint8_t* pDataBuff, size_t dataBuffLen, size_t* pBytesSentCount);
+int ddl_serial_send(const uint8_t* pDataBuff, size_t dataBuffLen, size_t* pBytesSentCount);
 
 /**
  * @brief Receive data from the serial interface.
  * @param[out] pDataBuff Pointer to the buffer where received data will be stored.
  * @param[in] dataBuffLen Length of the buffer.
+ * @param[out] pBytesReceivedCount Pointer to store the count of bytes received.
  * @return 0 on success, negative value on error.
  * @details This function retrieves data received from the serial interface and stores it in the
  * provided buffer.
@@ -82,7 +84,6 @@ int ddl_serial_recv(uint8_t* pDataBuff, size_t dataBuffLen, size_t* pBytesReceiv
 void ddl_serial_task(void* pvParameters);
 
 int ddl_serial_port_init(void);
-
 int ddl_serial_port_deinit(void);
 
 /**

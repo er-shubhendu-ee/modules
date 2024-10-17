@@ -72,7 +72,7 @@ void ddl_serial_register_cb(ddl_serial_event_cb_t callback) {
     gSerialEvent_cb = callback;  // Registers a callback function for serial events
 }
 
-int ddl_serial_send(uint8_t* pDataBuff, size_t dataBuffLen, size_t* pBytesSentCount) {
+int ddl_serial_send(const uint8_t* pDataBuff, size_t dataBuffLen, size_t* pBytesSentCount) {
     int exeStatus = NO_ERROR;
 
     // Validate input parameters
