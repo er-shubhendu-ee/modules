@@ -19,6 +19,10 @@
 
 #define TAG "APP_SERIAL_PORT"
 
+#define COM_PORT_NUMBER 1  // Change this to select a different COM port
+
+#define COM_PORT_STRING "\\\\.\\COM" STR(COM_PORT_NUMBER)
+
 uint8_t gBuff_rxStreamQueue[128];
 ddl_queue_handle_t ghQueue_rxStream;
 
@@ -57,7 +61,7 @@ int ddl_serial_port_init(void) {
 
     // Open the serial port
     ghComPort =
-        CreateFile("\\\\.\\COM1", GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
+        CreateFile(COM_PORT_STRING, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
     if (ghComPort == INVALID_HANDLE_VALUE) {
 #if LOG_LEVEL > LOG_LEVEL_NONE
         DDL_LOGE(TAG, "Error in opening serial port: %d", GetLastError());
