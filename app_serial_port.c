@@ -51,6 +51,7 @@ int ddl_serial_port_init(void) {
         goto cleanup;
     }
 
+    // Open the serial port
     ghComPort =
         CreateFile("\\\\.\\COM1", GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
     if (ghComPort == INVALID_HANDLE_VALUE) {
@@ -60,12 +61,46 @@ int ddl_serial_port_init(void) {
     } else {
         DDL_LOGI(TAG, "Opening serial port successful");
     }
+
+    // Configure the COM port
+    DCB dcbSerialParams = {0};
+    dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
+    if (!GetCommState(ghComPort, &dcbSerialParams)) {
+        DDL_LOGI(TAG, "Error getting state: %d", GetLastError());
+        exeStatus = ERROR_OPEN_FAILED;
+        goto cleanup;
+    }
+
+    // Set parameters (example values)
+    dcbSerialParams.BaudRate = CBR_9600;    // Baud rate
+    dcbSerialParams.ByteSize = 8;           // Data bits
+    dcbSerialParams.StopBits = ONESTOPBIT;  // Stop bits
+    dcbSerialParams.Parity = NOPARITY;      // Parity
+
+    // Set the new state
+    if (!SetCommState(ghComPort, &dcbSerialParams)) {
+        DDL_LOGI(TAG, "Error setting state: %d", GetLastError());
+        exeStatus = ERROR_OPEN_FAILED;
+        goto cleanup;
+    }
+
+    // Set timeouts
+    COMMTIMEOUTS timeouts = {0};
+    timeouts.ReadIntervalTimeout = 50;          // Maximum time between characters
+    timeouts.ReadTotalTimeoutConstant = 50;     // Total timeout for read
+    timeouts.ReadTotalTimeoutMultiplier = 10;   // Multiplier for total timeout
+    timeouts.WriteTotalTimeoutConstant = 50;    // Total timeout for write
+    timeouts.WriteTotalTimeoutMultiplier = 10;  // Multiplier for write
+    if (!SetCommTimeouts(ghComPort, &timeouts)) {
+        DDL_LOGI(TAG, "Error setting timeouts: %d", GetLastError());
+        exeStatus = ERROR_OPEN_FAILED;
+        goto cleanup;
+    }
 #endif
 
 cleanup:
     // If there was an error, ensure to clean up resources
     if (exeStatus != NO_ERROR) {
-        // No ddl_queue_destroy; the static queue doesn't require explicit deletion
         if (ghComPort != INVALID_HANDLE_VALUE) {
             CloseHandle(ghComPort);
         }
@@ -91,10 +126,15 @@ int ddl_serial_port_tx_byte(uint8_t value) {
     DDL_LOGI(TAG, "Transmitting value: %02X", value);  // Log transmission
 #if defined _WINDOWS_
     uint8_t byteTx = value;
-    bool status = WriteFile(ghComPort, &byteTx, sizeof(byteTx), NULL, NULL);
+    DWORD bytesWritten;
+    bool status = WriteFile(ghComPort, &byteTx, sizeof(byteTx), &bytesWritten, NULL);
     if (!status) {
         DDL_LOGI(TAG, "Error: 0x%8.8X", GetLastError());
         return -1;  // Indicate error
+    }
+    if (bytesWritten != sizeof(byteTx)) {
+        DDL_LOGI(TAG, "Warning: Not all bytes written.");
+        return -1;  // Indicate partial write
     }
 #endif
     return 0;  // Indicate success
@@ -114,7 +154,7 @@ DWORD WINAPI ThreadFunction1(LPVOID lpParam) {
     while (!shouldStopThreads) {
         DDL_LOGI(TAG, "Thread 1 is running.");
         ddl_serial_task(NULL);  // Execute the serial task and return its status
-        Sleep(1000);            // Sleep for 1 second
+        Sleep(10);              // Sleep for 1 second
     }
     return 0;
 }
@@ -135,7 +175,7 @@ DWORD WINAPI app_thread_rx_byte(LPVOID lpParam) {
         } else {
             DDL_LOGI(TAG, "Error reading from serial port: %d", GetLastError());
         }
-        Sleep(100);  // Sleep for 100 milliseconds
+        Sleep(10);  // Sleep for 100 milliseconds
     }
     return 0;
 }
