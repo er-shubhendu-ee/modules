@@ -23,8 +23,11 @@
 
 #define TAG "APP"  // Define a tag for logging purposes
 
+#define LOG_LEVEL LOG_LEVEL_INFO
+
 // Function prototype for the serial event callback
 static void app_serial_event_cb(ddl_SerialEvent_t event);
+static uint8_t gdataBuffValidIndex = 0;
 
 // Global buffer for received data
 uint8_t gDataBuff[CONFIG_SERIAL_DATA_BUFF_SIZE] = {0};
@@ -82,41 +85,70 @@ static void app_serial_event_cb(ddl_SerialEvent_t event) {
 
     switch (event) {
         case DDL_SERIAL_EVENT_NONE:  // No event occurred
+#if LOG_LEVEL >= LOG_LEVEL_VERBOSE
             DDL_LOGI(TAG, "DDL_SERIAL_EVENT_NONE");
+#endif
             break;
 
         case DDL_SERIAL_EVENT_RX:  // Data has been received
+#if LOG_LEVEL >= LOG_LEVEL_VERBOSE
             DDL_LOGI(TAG, "DDL_SERIAL_EVENT_RX");
-            ddl_serial_recv(gDataBuff, sizeof(gDataBuff), &receivedBytesCount);
-            if (receivedBytesCount) {                                   // Receive data
+#endif
+            ddl_serial_recv((uint8_t*)gDataBuff + gdataBuffValidIndex,
+                            sizeof(gDataBuff) - gdataBuffValidIndex, &receivedBytesCount);
+            gdataBuffValidIndex = gdataBuffValidIndex + (uint8_t)receivedBytesCount;
+
+            if (gdataBuffValidIndex >= sizeof(gDataBuff)) {
+                gdataBuffValidIndex = 0;
+#if LOG_LEVEL > LOG_LEVEL_NONE
+                DDL_LOGE(TAG, "Error");
+#endif
+            }
+            if (receivedBytesCount) {
+#if LOG_LEVEL >= LOG_LEVEL_VERBOSE                                      // Receive data
                 DDL_LOGI(TAG, "Received data: 0x%2.2X", gDataBuff[0]);  // Log the received data
+#endif
             } else {
+#if LOG_LEVEL >= LOG_LEVEL_VERBOSE
                 DDL_LOGI(TAG, "Failed to receive data");
+#endif
             }
             break;
 
         case DDL_SERIAL_EVENT_TX:  // Data has been transmitted
+#if LOG_LEVEL >= LOG_LEVEL_VERBOSE
             DDL_LOGI(TAG, "DDL_SERIAL_EVENT_TX");
+#endif
             break;
 
         case DDL_SERIAL_EVENT_QUEUE_FULL_RX:  // RX queue is full
+#if LOG_LEVEL >= LOG_LEVEL_VERBOSE
             DDL_LOGI(TAG, "DDL_SERIAL_EVENT_QUEUE_FULL_RX");
+#endif
             break;
 
         case DDL_SERIAL_EVENT_QUEUE_EMPTY_RX:  // RX queue is empty
+#if LOG_LEVEL >= LOG_LEVEL_VERBOSE
             DDL_LOGI(TAG, "DDL_SERIAL_EVENT_QUEUE_EMPTY_RX");
+#endif
             break;
 
         case DDL_SERIAL_EVENT_QUEUE_EMPTY_TX:  // TX queue is empty
+#if LOG_LEVEL >= LOG_LEVEL_VERBOSE
             DDL_LOGI(TAG, "DDL_SERIAL_EVENT_QUEUE_EMPTY_TX");
+#endif
             break;
 
         case DDL_SERIAL_EVENT_QUEUE_FULL_TX:  // TX queue is full
+#if LOG_LEVEL >= LOG_LEVEL_VERBOSE
             DDL_LOGI(TAG, "DDL_SERIAL_EVENT_QUEUE_FULL_TX");
+#endif
             break;
 
         default:  // Handle unexpected events
-            DDL_LOGI(TAG, "Undefined event");
+#if LOG_LEVEL > LOG_LEVEL_NONE
+            DDL_LOGE(TAG, "Undefined event");
+#endif
             break;
     }
 }

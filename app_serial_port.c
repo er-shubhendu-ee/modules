@@ -37,7 +37,9 @@ int ddl_serial_port_init(void) {
     ghQueue_rxStream =
         ddl_queue_create_static(sizeof(uint8_t), sizeof(gBuff_rxStreamQueue), gBuff_rxStreamQueue);
     if (ghQueue_rxStream == NULL) {
+#if LOG_LEVEL > LOG_LEVEL_NONE
         DDL_LOGE(TAG, "Error in queue creation.");
+#endif
         return ERROR_NOT_ENOUGH_MEMORY;
     }
 
@@ -46,7 +48,9 @@ int ddl_serial_port_init(void) {
     thread1 = CreateThread(NULL, 0, ThreadFunction1, NULL, 0, NULL);
     thread2 = CreateThread(NULL, 0, app_thread_rx_byte, NULL, 0, NULL);
     if (thread1 == NULL || thread2 == NULL) {
-        DDL_LOGI(TAG, "Failed to create threads");
+#if LOG_LEVEL > LOG_LEVEL_NONE
+        DDL_LOGE(TAG, "Failed to create threads");
+#endif
         exeStatus = ERROR_NOT_ENOUGH_MEMORY;
         goto cleanup;
     }
@@ -55,18 +59,24 @@ int ddl_serial_port_init(void) {
     ghComPort =
         CreateFile("\\\\.\\COM1", GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
     if (ghComPort == INVALID_HANDLE_VALUE) {
-        DDL_LOGI(TAG, "Error in opening serial port: %d", GetLastError());
+#if LOG_LEVEL > LOG_LEVEL_NONE
+        DDL_LOGE(TAG, "Error in opening serial port: %d", GetLastError());
+#endif
         exeStatus = ERROR_OPEN_FAILED;
         goto cleanup;
     } else {
+#if LOG_LEVEL >= LOG_LEVEL_INFO
         DDL_LOGI(TAG, "Opening serial port successful");
+#endif
     }
 
     // Configure the COM port
     DCB dcbSerialParams = {0};
     dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
     if (!GetCommState(ghComPort, &dcbSerialParams)) {
-        DDL_LOGI(TAG, "Error getting state: %d", GetLastError());
+#if LOG_LEVEL > LOG_LEVEL_NONE
+        DDL_LOGE(TAG, "Error getting state: %d", GetLastError());
+#endif
         exeStatus = ERROR_OPEN_FAILED;
         goto cleanup;
     }
@@ -79,7 +89,9 @@ int ddl_serial_port_init(void) {
 
     // Set the new state
     if (!SetCommState(ghComPort, &dcbSerialParams)) {
-        DDL_LOGI(TAG, "Error setting state: %d", GetLastError());
+#if LOG_LEVEL > LOG_LEVEL_NONE
+        DDL_LOGE(TAG, "Error setting state: %d", GetLastError());
+#endif
         exeStatus = ERROR_OPEN_FAILED;
         goto cleanup;
     }
@@ -92,7 +104,9 @@ int ddl_serial_port_init(void) {
     timeouts.WriteTotalTimeoutConstant = 5;    // Total timeout for write
     timeouts.WriteTotalTimeoutMultiplier = 1;  // Multiplier for write
     if (!SetCommTimeouts(ghComPort, &timeouts)) {
-        DDL_LOGI(TAG, "Error setting timeouts: %d", GetLastError());
+#if LOG_LEVEL > LOG_LEVEL_NONE
+        DDL_LOGE(TAG, "Error setting timeouts: %d", GetLastError());
+#endif
         exeStatus = ERROR_OPEN_FAILED;
         goto cleanup;
     }
@@ -123,17 +137,23 @@ int ddl_serial_port_deinit(void) {
 }
 
 int ddl_serial_port_tx_byte(uint8_t value) {
+#if LOG_LEVEL >= LOG_LEVEL_INFO
     DDL_LOGI(TAG, "Transmitting value: %02X", value);  // Log transmission
+#endif
 #if defined _WINDOWS_
     uint8_t byteTx = value;
     DWORD bytesWritten;
     bool status = WriteFile(ghComPort, &byteTx, sizeof(byteTx), &bytesWritten, NULL);
     if (!status) {
-        DDL_LOGI(TAG, "Error: 0x%8.8X", GetLastError());
+#if LOG_LEVEL > LOG_LEVEL_NONE
+        DDL_LOGE(TAG, "Error: 0x%8.8X", GetLastError());
+#endif
         return -1;  // Indicate error
     }
     if (bytesWritten != sizeof(byteTx)) {
-        DDL_LOGI(TAG, "Warning: Not all bytes written.");
+#if LOG_LEVEL >= LOG_LEVEL_WARNING
+        DDL_LOGW(TAG, "Warning: Not all bytes written.");
+#endif
         return -1;  // Indicate partial write
     }
 #endif
@@ -146,15 +166,20 @@ int ddl_serial_port_rx_byte(uint8_t* pValue) {
         *pValue = rxByte;
         return 0;  // Indicate success
     }
+#if LOG_LEVEL > LOG_LEVEL_NONE
+    DDL_LOGE(TAG, "Error receiving byte from queue.");
+#endif
     return -1;  // Indicate failure
 }
 
 // Continuous task for the first thread
 DWORD WINAPI ThreadFunction1(LPVOID lpParam) {
     while (!shouldStopThreads) {
+#if LOG_LEVEL >= LOG_LEVEL_INFO
         DDL_LOGI(TAG, "Thread 1 is running.");
+#endif
         ddl_serial_task(NULL);  // Execute the serial task and return its status
-        Sleep(10);              // Sleep for 1 second
+        Sleep(10);              // Sleep for 10 milliseconds
     }
     return 0;
 }
@@ -164,18 +189,26 @@ DWORD WINAPI app_thread_rx_byte(LPVOID lpParam) {
     uint8_t byteReceived[256];  // Temporary buffer for received bytes
     DWORD bytesRead;
     while (!shouldStopThreads) {
+#if LOG_LEVEL >= LOG_LEVEL_INFO
         DDL_LOGI(TAG, "Thread 2 is running.");
+#endif
         // Attempt to read data from the COM port
         if (ReadFile(ghComPort, byteReceived, sizeof(byteReceived), &bytesRead, NULL)) {
             if (bytesRead > 0) {
                 for (size_t i = 0; i < bytesRead; i++) {
-                    ddl_queue_send(ghQueue_rxStream, &byteReceived[i]);
+                    if (ddl_queue_send(ghQueue_rxStream, &byteReceived[i]) != DDL_BASE_STATUS_OK) {
+#if LOG_LEVEL > LOG_LEVEL_NONE
+                        DDL_LOGE(TAG, "Error sending byte to queue.");
+#endif
+                    }
                 }
             }
         } else {
-            DDL_LOGI(TAG, "Error reading from serial port: %d", GetLastError());
+#if LOG_LEVEL > LOG_LEVEL_NONE
+            DDL_LOGE(TAG, "Error reading from serial port: %d", GetLastError());
+#endif
         }
-        Sleep(10);  // Sleep for 100 milliseconds
+        Sleep(10);  // Sleep for 10 milliseconds
     }
     return 0;
 }
