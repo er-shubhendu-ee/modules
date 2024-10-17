@@ -2,20 +2,16 @@
  * @file      app_serial_port.c
  * @author:   Shubhendu B B
  * @date:     16/10/2024
- * @brief
- * @details
- *
+ * @brief     Serial port handling application
+ * @details   Provides functions to initialize, transmit, and receive data via a serial port.
  * @copyright
- *
  **/
+
+#include <Windows.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 
-//
-#include <Windows.h>
-
-//
 #include "ddl_log.h"
 #include "ddl_queue.h"
 #include "ddl_serial.h"
@@ -31,6 +27,8 @@ HANDLE ghComPort;  // Handle for the COM port
 // Thread function prototypes
 DWORD WINAPI ThreadFunction1(LPVOID lpParam);
 DWORD WINAPI app_thread_rx_byte(LPVOID lpParam);
+HANDLE thread1, thread2;         // Store thread handles
+bool shouldStopThreads = false;  // Flag to signal threads to stop
 #endif
 
 int ddl_serial_port_init(void) {
@@ -38,46 +36,50 @@ int ddl_serial_port_init(void) {
 
     ghQueue_rxStream =
         ddl_queue_create_static(sizeof(uint8_t), sizeof(gBuff_rxStreamQueue), gBuff_rxStreamQueue);
-    if (NULL == ghQueue_rxStream) {
+    if (ghQueue_rxStream == NULL) {
         DDL_LOGE(TAG, "Error in queue creation.");
-        exeStatus = ERROR_NOT_ENOUGH_MEMORY;
-        goto label_exitPoint;
+        return ERROR_NOT_ENOUGH_MEMORY;
     }
 
 #if defined _WINDOWS_
-    // Create two threads for continuous functions
-    HANDLE thread1 = CreateThread(NULL, 0, ThreadFunction1, NULL, 0, NULL);
-    HANDLE thread2 = CreateThread(NULL, 0, app_thread_rx_byte, NULL, 0, NULL);
-
-    // Optionally check if threads were created successfully
+    // Create threads and check for success
+    thread1 = CreateThread(NULL, 0, ThreadFunction1, NULL, 0, NULL);
+    thread2 = CreateThread(NULL, 0, app_thread_rx_byte, NULL, 0, NULL);
     if (thread1 == NULL || thread2 == NULL) {
         DDL_LOGI(TAG, "Failed to create threads");
         exeStatus = ERROR_NOT_ENOUGH_MEMORY;
-        goto label_exitPoint;
+        goto cleanup;
     }
 
-    ghComPort = CreateFile("\\\\.\\COM1",                 // Open the specified COM port
-                           GENERIC_READ | GENERIC_WRITE,  // Read/Write
-                           0,                             // No Sharing
-                           NULL,                          // No Security
-                           OPEN_EXISTING,                 // Open existing port
-                           0,                             // Non Overlapped I/O
-                           NULL);                         // Null for Comm Devices
-
+    ghComPort =
+        CreateFile("\\\\.\\COM1", GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
     if (ghComPort == INVALID_HANDLE_VALUE) {
         DDL_LOGI(TAG, "Error in opening serial port: %d", GetLastError());
-        exeStatus = ERROR_OPEN_FAILED;  // Set appropriate error code
-        goto label_exitPoint;
+        exeStatus = ERROR_OPEN_FAILED;
+        goto cleanup;
     } else {
         DDL_LOGI(TAG, "Opening serial port successful");
     }
 #endif
-label_exitPoint:
+
+cleanup:
+    // If there was an error, ensure to clean up resources
+    if (exeStatus != NO_ERROR) {
+        // No ddl_queue_destroy; the static queue doesn't require explicit deletion
+        if (ghComPort != INVALID_HANDLE_VALUE) {
+            CloseHandle(ghComPort);
+        }
+    }
+
     return exeStatus;
 }
 
 int ddl_serial_port_deinit(void) {
 #if defined _WINDOWS_
+    shouldStopThreads = true;                // Signal threads to stop
+    WaitForSingleObject(thread1, INFINITE);  // Wait for thread 1 to finish
+    WaitForSingleObject(thread2, INFINITE);  // Wait for thread 2 to finish
+
     if (ghComPort != INVALID_HANDLE_VALUE) {
         CloseHandle(ghComPort);  // Close the COM port handle
     }
@@ -92,6 +94,7 @@ int ddl_serial_port_tx_byte(uint8_t value) {
     bool status = WriteFile(ghComPort, &byteTx, sizeof(byteTx), NULL, NULL);
     if (!status) {
         DDL_LOGI(TAG, "Error: 0x%8.8X", GetLastError());
+        return -1;  // Indicate error
     }
 #endif
     return 0;  // Indicate success
@@ -108,34 +111,31 @@ int ddl_serial_port_rx_byte(uint8_t* pValue) {
 
 // Continuous task for the first thread
 DWORD WINAPI ThreadFunction1(LPVOID lpParam) {
-    while (1) {
-        // Your continuous task for thread 1
+    while (!shouldStopThreads) {
         DDL_LOGI(TAG, "Thread 1 is running.");
         ddl_serial_task(NULL);  // Execute the serial task and return its status
-        Sleep(10);              // Sleep for 1 second
+        Sleep(1000);            // Sleep for 1 second
     }
     return 0;
 }
 
 // Continuous task for the second thread
 DWORD WINAPI app_thread_rx_byte(LPVOID lpParam) {
-    uint8_t byteReceived;
+    uint8_t byteReceived[256];  // Temporary buffer for received bytes
     DWORD bytesRead;
-    while (1) {
-        // Your continuous task for thread 2
+    while (!shouldStopThreads) {
         DDL_LOGI(TAG, "Thread 2 is running.");
         // Attempt to read data from the COM port
-        if (ReadFile(ghComPort, &byteReceived, sizeof(byteReceived), &bytesRead, NULL)) {
+        if (ReadFile(ghComPort, byteReceived, sizeof(byteReceived), &bytesRead, NULL)) {
             if (bytesRead > 0) {
-                // Send received bytes to the queue
                 for (size_t i = 0; i < bytesRead; i++) {
-                    ddl_queue_send(ghQueue_rxStream, &byteReceived);
+                    ddl_queue_send(ghQueue_rxStream, &byteReceived[i]);
                 }
             }
         } else {
             DDL_LOGI(TAG, "Error reading from serial port: %d", GetLastError());
         }
-        Sleep(10);  // Sleep for 1 second
+        Sleep(100);  // Sleep for 100 milliseconds
     }
     return 0;
 }
