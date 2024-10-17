@@ -23,6 +23,8 @@
 
 #define COM_PORT_STRING "\\\\.\\COM" STR(COM_PORT_NUMBER)
 
+#define LOG_LEVEL LOG_LEVEL_DEBUG
+
 uint8_t gBuff_rxStreamQueue[128];
 ddl_queue_handle_t ghQueue_rxStream;
 
@@ -33,7 +35,7 @@ DWORD WINAPI ThreadFunction1(LPVOID lpParam);
 DWORD WINAPI app_thread_rx_byte(LPVOID lpParam);
 HANDLE thread1, thread2;         // Store thread handles
 bool shouldStopThreads = false;  // Flag to signal threads to stop
-#endif
+#endif                           // defined _WINDOWS_
 
 int ddl_serial_port_init(void) {
     int exeStatus = NO_ERROR;
@@ -43,35 +45,24 @@ int ddl_serial_port_init(void) {
     if (ghQueue_rxStream == NULL) {
 #if LOG_LEVEL > LOG_LEVEL_NONE
         DDL_LOGE(TAG, "Error in queue creation.");
-#endif
+#endif  // LOG_LEVEL > LOG_LEVEL_NONE
         return ERROR_NOT_ENOUGH_MEMORY;
     }
 
 #if defined _WINDOWS_
-    // Create threads and check for success
-    thread1 = CreateThread(NULL, 0, ThreadFunction1, NULL, 0, NULL);
-    thread2 = CreateThread(NULL, 0, app_thread_rx_byte, NULL, 0, NULL);
-    if (thread1 == NULL || thread2 == NULL) {
-#if LOG_LEVEL > LOG_LEVEL_NONE
-        DDL_LOGE(TAG, "Failed to create threads");
-#endif
-        exeStatus = ERROR_NOT_ENOUGH_MEMORY;
-        goto cleanup;
-    }
-
     // Open the serial port
     ghComPort =
         CreateFile(COM_PORT_STRING, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
     if (ghComPort == INVALID_HANDLE_VALUE) {
 #if LOG_LEVEL > LOG_LEVEL_NONE
         DDL_LOGE(TAG, "Error in opening serial port: %d", GetLastError());
-#endif
+#endif  // LOG_LEVEL > LOG_LEVEL_NONE
         exeStatus = ERROR_OPEN_FAILED;
         goto cleanup;
     } else {
 #if LOG_LEVEL >= LOG_LEVEL_INFO
         DDL_LOGI(TAG, "Opening serial port successful");
-#endif
+#endif  // LOG_LEVEL >= LOG_LEVEL_INFO
     }
 
     // Configure the COM port
@@ -80,7 +71,7 @@ int ddl_serial_port_init(void) {
     if (!GetCommState(ghComPort, &dcbSerialParams)) {
 #if LOG_LEVEL > LOG_LEVEL_NONE
         DDL_LOGE(TAG, "Error getting state: %d", GetLastError());
-#endif
+#endif  // LOG_LEVEL > LOG_LEVEL_NONE
         exeStatus = ERROR_OPEN_FAILED;
         goto cleanup;
     }
@@ -95,7 +86,7 @@ int ddl_serial_port_init(void) {
     if (!SetCommState(ghComPort, &dcbSerialParams)) {
 #if LOG_LEVEL > LOG_LEVEL_NONE
         DDL_LOGE(TAG, "Error setting state: %d", GetLastError());
-#endif
+#endif  // LOG_LEVEL > LOG_LEVEL_NONE
         exeStatus = ERROR_OPEN_FAILED;
         goto cleanup;
     }
@@ -110,11 +101,21 @@ int ddl_serial_port_init(void) {
     if (!SetCommTimeouts(ghComPort, &timeouts)) {
 #if LOG_LEVEL > LOG_LEVEL_NONE
         DDL_LOGE(TAG, "Error setting timeouts: %d", GetLastError());
-#endif
+#endif  // LOG_LEVEL > LOG_LEVEL_NONE
         exeStatus = ERROR_OPEN_FAILED;
         goto cleanup;
     }
-#endif
+    // Create threads and check for success
+    thread1 = CreateThread(NULL, 0, ThreadFunction1, NULL, 0, NULL);
+    thread2 = CreateThread(NULL, 0, app_thread_rx_byte, NULL, 0, NULL);
+    if (thread1 == NULL || thread2 == NULL) {
+#if LOG_LEVEL > LOG_LEVEL_NONE
+        DDL_LOGE(TAG, "Failed to create threads");
+#endif  // LOG_LEVEL > LOG_LEVEL_NONE
+        exeStatus = ERROR_NOT_ENOUGH_MEMORY;
+        goto cleanup;
+    }
+#endif  // defined _WINDOWS_
 
 cleanup:
     // If there was an error, ensure to clean up resources
@@ -136,14 +137,14 @@ int ddl_serial_port_deinit(void) {
     if (ghComPort != INVALID_HANDLE_VALUE) {
         CloseHandle(ghComPort);  // Close the COM port handle
     }
-#endif
+#endif  // defined _WINDOWS_
     return 0;
 }
 
 int ddl_serial_port_tx_byte(uint8_t value) {
 #if LOG_LEVEL >= LOG_LEVEL_INFO
     DDL_LOGI(TAG, "Transmitting value: %02X", value);  // Log transmission
-#endif
+#endif                                                 // LOG_LEVEL >= LOG_LEVEL_INFO
 #if defined _WINDOWS_
     uint8_t byteTx = value;
     DWORD bytesWritten;
@@ -151,16 +152,16 @@ int ddl_serial_port_tx_byte(uint8_t value) {
     if (!status) {
 #if LOG_LEVEL > LOG_LEVEL_NONE
         DDL_LOGE(TAG, "Error: 0x%8.8X", GetLastError());
-#endif
+#endif              // LOG_LEVEL > LOG_LEVEL_NONE
         return -1;  // Indicate error
     }
     if (bytesWritten != sizeof(byteTx)) {
 #if LOG_LEVEL >= LOG_LEVEL_WARNING
         DDL_LOGW(TAG, "Warning: Not all bytes written.");
-#endif
+#endif              // LOG_LEVEL >= LOG_LEVEL_WARNING
         return -1;  // Indicate partial write
     }
-#endif
+#endif         // defined _WINDOWS_
     return 0;  // Indicate success
 }
 
@@ -170,9 +171,9 @@ int ddl_serial_port_rx_byte(uint8_t* pValue) {
         *pValue = rxByte;
         return 0;  // Indicate success
     }
-#if LOG_LEVEL > LOG_LEVEL_NONE
-    DDL_LOGE(TAG, "Error receiving byte from queue.");
-#endif
+#if LOG_LEVEL >= LOG_LEVEL_DEBUG
+    DDL_LOGD(TAG, "ghQueue_rxStream queue empty.");
+#endif          // LOG_LEVEL > LOG_LEVEL_NONE
     return -1;  // Indicate failure
 }
 
@@ -181,7 +182,7 @@ DWORD WINAPI ThreadFunction1(LPVOID lpParam) {
     while (!shouldStopThreads) {
 #if LOG_LEVEL >= LOG_LEVEL_INFO
         DDL_LOGI(TAG, "Thread 1 is running.");
-#endif
+#endif                          // LOG_LEVEL >= LOG_LEVEL_INFO
         ddl_serial_task(NULL);  // Execute the serial task and return its status
         Sleep(10);              // Sleep for 10 milliseconds
     }
@@ -195,22 +196,23 @@ DWORD WINAPI app_thread_rx_byte(LPVOID lpParam) {
     while (!shouldStopThreads) {
 #if LOG_LEVEL >= LOG_LEVEL_INFO
         DDL_LOGI(TAG, "Thread 2 is running.");
-#endif
+#endif  // LOG_LEVEL >= LOG_LEVEL_INFO
         // Attempt to read data from the COM port
         if (ReadFile(ghComPort, byteReceived, sizeof(byteReceived), &bytesRead, NULL)) {
             if (bytesRead > 0) {
                 for (size_t i = 0; i < bytesRead; i++) {
+                    // printf("%C", byteReceived[i]);
                     if (ddl_queue_send(ghQueue_rxStream, &byteReceived[i]) != DDL_BASE_STATUS_OK) {
 #if LOG_LEVEL > LOG_LEVEL_NONE
                         DDL_LOGE(TAG, "Error sending byte to queue.");
-#endif
+#endif  // LOG_LEVEL > LOG_LEVEL_NONE
                     }
                 }
             }
         } else {
 #if LOG_LEVEL > LOG_LEVEL_NONE
             DDL_LOGE(TAG, "Error reading from serial port: %d", GetLastError());
-#endif
+#endif  // LOG_LEVEL > LOG_LEVEL_NONE
         }
         Sleep(10);  // Sleep for 10 milliseconds
     }

@@ -19,11 +19,14 @@
 #include "config.h"
 #include "ddl_log.h"
 #include "ddl_serial.h"
+#include "ddl_util.h"
 #include "error.h"
 
 #define TAG "APP"  // Define a tag for logging purposes
 
 #define LOG_LEVEL LOG_LEVEL_INFO
+
+#define DELIMITER_STRING "\n"
 
 // Function prototype for the serial event callback
 static void app_serial_event_cb(ddl_SerialEvent_t event);
@@ -97,7 +100,9 @@ static void app_serial_event_cb(ddl_SerialEvent_t event) {
             ddl_serial_recv((uint8_t*)gDataBuff + gdataBuffValidIndex,
                             sizeof(gDataBuff) - gdataBuffValidIndex, &receivedBytesCount);
             gdataBuffValidIndex = gdataBuffValidIndex + (uint8_t)receivedBytesCount;
-
+            if (gdataBuffValidIndex) {
+                printf("%c", *((uint8_t*)gDataBuff + gdataBuffValidIndex - 1));
+            }
             if (gdataBuffValidIndex >= sizeof(gDataBuff)) {
                 gdataBuffValidIndex = 0;
 #if LOG_LEVEL > LOG_LEVEL_NONE
