@@ -86,11 +86,11 @@ int ddl_serial_port_init(void) {
 
     // Set timeouts
     COMMTIMEOUTS timeouts = {0};
-    timeouts.ReadIntervalTimeout = 50;          // Maximum time between characters
-    timeouts.ReadTotalTimeoutConstant = 50;     // Total timeout for read
-    timeouts.ReadTotalTimeoutMultiplier = 10;   // Multiplier for total timeout
-    timeouts.WriteTotalTimeoutConstant = 50;    // Total timeout for write
-    timeouts.WriteTotalTimeoutMultiplier = 10;  // Multiplier for write
+    timeouts.ReadIntervalTimeout = 1;          // Maximum time between characters
+    timeouts.ReadTotalTimeoutConstant = 1;     // Total timeout for read
+    timeouts.ReadTotalTimeoutMultiplier = 1;   // Multiplier for total timeout
+    timeouts.WriteTotalTimeoutConstant = 5;    // Total timeout for write
+    timeouts.WriteTotalTimeoutMultiplier = 1;  // Multiplier for write
     if (!SetCommTimeouts(ghComPort, &timeouts)) {
         DDL_LOGI(TAG, "Error setting timeouts: %d", GetLastError());
         exeStatus = ERROR_OPEN_FAILED;
